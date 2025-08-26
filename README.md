@@ -4,22 +4,22 @@ Applications for [BEAST 3](https://github.com/CompEvol/beast2/) with (most) GUIs
 
 ## Building & compiling
 
-BEAST now uses Java 24 instead of Java 8, which might give a small performance boost for some models and allows access to Java 24 features.
+BEAST now uses Java 21 instead of Java 8, which might give a small performance boost for some models and allows access to Java 21 features.
 
 It is recommended to install the JDK from Azul, since it allows painless integration of JavaFX. It can be downloaded from here: [https://www.azul.com/downloads/?package=jdk](https://www.azul.com/downloads/?package=jdk)
 
 * scroll to the bottom
-* select `Java 24 LTS`
+* select `Java 21 LTS`
 * select your operating system
 * select `JDK FX` ** make sure to include FX and not just select JDK without FX **
 * download the file and install according to instructions under the `How to install` link.
 
-In the IDE that you are using, make sure that the JDK points to Java 24.
+In the IDE that you are using, make sure that the JDK points to Java 21.
 
 It is convenient to make this JDK the default. For Linux, this can be done by adding to your `~/.bashrc` file the following two lines:
 
 ```
-export JAVA_HOME=/path/to/zulu24.34.19-ca-fx-jdk24.0.3-linux_x64
+export JAVA_HOME=/path/to/zulu21.34.19-ca-fx-jdk21.0.3-linux_x64
 export PATH=${JAVA_HOME}/bin:${PATH}
 ```
 
