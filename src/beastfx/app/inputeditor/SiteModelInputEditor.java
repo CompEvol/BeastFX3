@@ -14,6 +14,8 @@ import beast.base.inference.*;
 import beast.base.inference.operator.kernel.BactrianDeltaExchangeOperator;
 import beast.base.inference.parameter.IntegerParameter;
 import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.type.RealScalar;
 import beastfx.app.util.FXUtils;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -159,7 +161,7 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
 			public void validateInput() {
         		super.validateInput();
             	SiteModel sitemodel = (SiteModel) m_beastObject; 
-                if (sitemodel.gammaCategoryCount.get() < 2 && sitemodel.shapeParameterInput.get().isEstimatedInput.get()) {
+                if (sitemodel.gammaCategoryCount.get() < 2 && ((StateNode)sitemodel.shapeParameterInput.get()).isEstimatedInput.get()) {
                 	m_validateLabel.setColor("orange");
                 	m_validateLabel.setTooltip(new Tooltip("shape parameter is estimated, but not used"));
                 	m_validateLabel.setVisible(true);
@@ -197,20 +199,20 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
             int categoryCount = Integer.parseInt(categories);
             SiteModel s = (SiteModel) m_input.get();
             s.getInput("gammaCategoryCount").setValue(categoryCount, s);
-        	RealParameter shapeParameter = ((SiteModel) m_input.get()).shapeParameterInput.get();
+        	RealScalar<PositiveReal> shapeParameter = ((SiteModel) m_input.get()).shapeParameterInput.get();
             if (!gammaShapeEditor.getComponent().isVisible() && categoryCount >= 2) {
             	// we are flipping from no gamma to gamma heterogeneity accross sites
             	// so set the estimate flag on the shape parameter
-            	shapeParameter.isEstimatedInput.setValue(true, shapeParameter);            	
+            	((StateNode)shapeParameter).isEstimatedInput.setValue(true, (BEASTInterface) shapeParameter);            	
             } else if (gammaShapeEditor.getComponent().isVisible() && categoryCount < 2) {
             	// we are flipping from with gamma to no gamma heterogeneity accross sites
             	// so unset the estimate flag on the shape parameter
-            	shapeParameter.isEstimatedInput.setValue(false, shapeParameter);            	
+            	((StateNode)shapeParameter).isEstimatedInput.setValue(false, (BEASTInterface) shapeParameter);            	
             }
             Object o = ((ParameterInputEditor)gammaShapeEditor).getComponent();
             if (o instanceof ParameterInputEditor) {
 	            ParameterInputEditor e = (ParameterInputEditor) o;
-	            e.m_isEstimatedBox.setSelected(shapeParameter.isEstimatedInput.get());
+	            e.m_isEstimatedBox.setSelected(((StateNode)shapeParameter).isEstimatedInput.get());
             }
             gammaShapeEditor.getComponent().setVisible(categoryCount >= 2);
             gammaShapeEditor.getComponent().setManaged(categoryCount >= 2);
@@ -279,16 +281,16 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
 	    		}
 	    		if (treelikelihood.siteModelInput.get() instanceof SiteModel) {
 		    		SiteModel siteModel = (SiteModel) treelikelihood.siteModelInput.get();
-		    		RealParameter mutationRate = siteModel.muParameterInput.get();
+		    		RealScalar<PositiveReal> mutationRate = siteModel.muParameterInput.get();
 		    		//clockRate.m_bIsEstimated.setValue(true, clockRate);
-		    		if (mutationRate.isEstimatedInput.get()) {
+		    		if (((StateNode)mutationRate).isEstimatedInput.get()) {
 		    			hasOneEstimatedRate = true;
-		    			if (rateIDs.indexOf(mutationRate.getID()) == -1) {
-			    			parameters.add(mutationRate);
+		    			if (rateIDs.indexOf(((BEASTInterface)mutationRate).getID()) == -1) {
+			    			parameters.add((RealParameter)mutationRate);
 			    			weights.add(weight);
-			    			rateIDs.add(mutationRate.getID());
+			    			rateIDs.add(((BEASTInterface)mutationRate).getID());
 		    			} else {
-		    				int k = rateIDs.indexOf(mutationRate.getID());
+		    				int k = rateIDs.indexOf(((BEASTInterface)mutationRate).getID());
 			    			weights.set(k,  weights.get(k) + weight);
 		    			}
 		    		}
@@ -341,13 +343,13 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
     				GenericTreeLikelihood treelikelihood = (GenericTreeLikelihood) d;
     	    		if (treelikelihood.siteModelInput.get() instanceof SiteModel) {
     		    		SiteModel siteModel = (SiteModel) treelikelihood.siteModelInput.get();
-    		    		RealParameter mutationRate = siteModel.muParameterInput.get();
+    		    		RealScalar<PositiveReal> mutationRate = siteModel.muParameterInput.get();
     		    		//clockRate.m_bIsEstimated.setValue(true, clockRate);
-    		    		if (mutationRate.isEstimatedInput.get()) {
+    		    		if (((StateNode)mutationRate).isEstimatedInput.get()) {
     		    			if (commonClockRate < 0) {
-    		    				commonClockRate = mutationRate.valuesInput.get().get(0);
+    		    				commonClockRate = mutationRate.get();
     		    			} else {
-    		    				if (Math.abs(commonClockRate - mutationRate.valuesInput.get().get(0)) > 1e-10) {
+    		    				if (Math.abs(commonClockRate - mutationRate.get()) > 1e-10) {
     		    					isAllClocksAreEqual = false;
     		    				}
     		    			}

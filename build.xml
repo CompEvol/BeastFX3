@@ -572,24 +572,24 @@
 	<condition property="isMac"><os family="mac" /></condition>
 
 	<target name="installLinux" depends="package" if="isLinux">
-	        <mkdir dir="${user.home}/.beast/2.7/BEAST.base"/>
-			<unzip src="${distFX}/BEAST.base.package.v${version}.zip" dest="${user.home}/.beast/2.7/BEAST.base"/>
-	        <mkdir dir="${user.home}/.beast/2.7/BEAST.app"/>
-			<unzip src="${distFX}/BEAST.app.package.v${version}.zip" dest="${user.home}/.beast/2.7/BEAST.app"/>
+	        <mkdir dir="${user.home}/.beast/3.0/BEAST.base"/>
+			<unzip src="${distFX}/BEAST.base.package.v${version}.zip" dest="${user.home}/.beast/3.0/BEAST.base"/>
+	        <mkdir dir="${user.home}/.beast/3.0/BEAST.app"/>
+			<unzip src="${distFX}/BEAST.app.package.v${version}.zip" dest="${user.home}/.beast/3.0/BEAST.app"/>
 	</target>
 
 	<target name="installMac" depends="package" if="isMac">
-	        <mkdir dir="${user.home}/Library/Application Support/BEAST/2.7/BEAST.base"/>
-			<unzip src="${distFX}/BEAST.base.package.v${version}.zip" dest="${user.home}/Library/Application Support/BEAST/2.7/BEAST.base"/>
-	        <mkdir dir="${user.home}/Library/Application Support/BEAST/2.7/BEAST.app"/>
-			<unzip src="${distFX}/BEAST.app.package.v${version}.zip" dest="${user.home}/Library/Application Support/BEAST/2.7/BEAST.app"/>
+	        <mkdir dir="${user.home}/Library/Application Support/BEAST/3.0/BEAST.base"/>
+			<unzip src="${distFX}/BEAST.base.package.v${version}.zip" dest="${user.home}/Library/Application Support/BEAST/3.0/BEAST.base"/>
+	        <mkdir dir="${user.home}/Library/Application Support/BEAST/3.0/BEAST.app"/>
+			<unzip src="${distFX}/BEAST.app.package.v${version}.zip" dest="${user.home}/Library/Application Support/BEAST/3.0/BEAST.app"/>
 	</target>
 
 	<target name="installWindows" depends="package" if="isWindows">
-	        <mkdir dir="${user.home}/BEAST/2.7/BEAST.base"/>
-			<unzip src="${distFX}/BEAST.base.package.v${version}.zip" dest="${user.home}/BEAST/2.7/BEAST.base"/>
-	        <mkdir dir="${user.home}/BEAST/2.7/BEAST.app"/>
-			<unzip src="${distFX}/BEAST.app.package.v${version}.zip" dest="${user.home}/BEAST/2.7/BEAST.app"/>
+	        <mkdir dir="${user.home}/BEAST/3.0/BEAST.base"/>
+			<unzip src="${distFX}/BEAST.base.package.v${version}.zip" dest="${user.home}/BEAST/3.0/BEAST.base"/>
+	        <mkdir dir="${user.home}/BEAST/3.0/BEAST.app"/>
+			<unzip src="${distFX}/BEAST.app.package.v${version}.zip" dest="${user.home}/BEAST/3.0/BEAST.app"/>
 	</target>
 
 	<target name="install" depends="installWindows,installMac,installLinux">
