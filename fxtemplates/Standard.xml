@@ -1,5 +1,5 @@
 <beast version='2.0'
-       namespace='beastfx.app.beauti:beastfx.app.inputeditor:beast.pkgmgmt:beast.base.core:beast.base.inference:beast.base.evolution.branchratemodel:beast.base.evolution.speciation:beast.base.evolution.tree.coalescent:beast.base.util:beast.base.math:beast.evolution.nuc:beast.base.evolution.operator:beast.base.inference.operator:beast.base.evolution.sitemodel:beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood:beast.evolution:beast.base.inference.distribution'
+       namespace='beastfx.app.beauti:beastfx.app.inputeditor:beast.pkgmgmt:beast.base.core:beast.base.inference:beast.base.evolution.branchratemodel:beast.base.evolution.speciation:beast.base.evolution.tree.coalescent:beast.base.util:beast.base.math:beast.evolution.nuc:beast.base.evolution.operator:beast.base.inference.operator:beast.base.spec.evolution.sitemodel:beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood:beast.evolution:beast.base.inference.distribution'
 	templateinfo='template for standard phylogenetic analysis,&lt;br> supporting tip-date analysis and calibrations'>
 
 <map name='connect' reserved='true'>beastfx.app.inputeditor.BeautiConnector</map>
@@ -18,14 +18,14 @@
     <beauticonfig spec='BeautiConfig'
         inputLabelMap='beast.base.inference.MCMC.operator=Operators,
 	        beast.base.inference.MCMC.logger=Loggers,
-			beast.base.evolution.sitemodel.SiteModel.mutationRate=Substitution Rate,
+			beast.base.spec.evolution.sitemodel.SiteModel.mutationRate=Substitution Rate,
 			beast.base.evolution.speciation.YuleModel.birthDiffRate=Birth Rate,
 			beast.base.evolution.branchratemodel.UCRelaxedClockModel.clock.rate=Mean clock rate,
 			beast.base.evolution.branchratemodel.StrictClockModel.clock.rate=Mean clock rate,
 			beast.base.evolution.branchratemodel.RandomLocalClockModel.clock.rate=Mean clock rate
 			'
         inlinePlugins ='beast.base.inference.MCMC.distribution,
-            beast.base.evolution.sitemodel.SiteModel.substModel,
+            beast.base.evolution.spec.sitemodel.SiteModel.substModel,
             beast.base.evolution.tree.coalescent.ExponentialGrowth,
             beast.base.evolution.tree.coalescent.ConstantPopulation,
             beast.base.evolution.tree.coalescent.Coalescent,
@@ -253,13 +253,8 @@ ClusterTree/clusterType/,
         <partitiontemplate id='StandardPartitionTemplate' spec='BeautiSubTemplate' class='beast.base.evolution.likelihood.ThreadedTreeLikelihood' mainid='mcmc'>
 <![CDATA[
             <!-- site model                                                              -->
-            <plugin spec='SiteModel' id="SiteModel.s:$(n)" gammaCategoryCount='0'>
+            <plugin spec='beast.base.spec.evolution.sitemodel.SiteModel' id="SiteModel.s:$(n)" gammaCategoryCount='0'>
                 <!--substModel will be automatically detected /-->
-                <!--
-                <proportionInvariant spec='parameter.RealParameter' id='proportionInvariant.s:$(n)' value='0.0' lower='0' upper='1' estimate='false'/>
-                <mutationRate        spec='parameter.RealParameter' id='mutationRate.s:$(n)' value='1.0' lower="0.0" estimate='false'/>
-                <shape               spec='parameter.RealParameter' id='gammaShape.s:$(n)' value='1.0' lower="0.1" estimate='false'/>
-				-->
                 <proportionInvariant spec="beast.base.spec.parameter.RealScalarParam" domain="NonNegativeReal" id='proportionInvariant.s:$(n)' value='0.0' lower='0' upper='1' estimate='false'/>
                 <mutationRate        spec="beast.base.spec.parameter.RealScalarParam" domain="PositiveReal" id='mutationRate.s:$(n)' value='1.0' lower="0.0" estimate='false'/>
                 <shape               spec="beast.base.spec.parameter.RealScalarParam" domain="PositiveReal" id='gammaShape.s:$(n)' value='1.0' lower="0.1" estimate='false'/>
@@ -378,7 +373,7 @@ ClusterTree/clusterType/,
 ]]>
             <connect srcID='treeLikelihood.$(n)'            targetID='likelihood' inputName='distribution' if="isInitializing"/>
             <connect srcID='YuleModel.t:$(n)'               targetID='prior' inputName='distribution' if="isInitializing"/>
-			<connect method="beastfx.app.inputeditor.SiteModelInputEditor.customConnector"/>
+			<connect method="beastfx.app.inputeditor.spec.SiteModelInputEditor.customConnector"/>
 			
 			<!-- for deciding whether to connect the mean clock rate to the AVMN operator -->
 			<connect method="beastfx.app.inputeditor.SiteModelInputEditor.avmnConnector"/>

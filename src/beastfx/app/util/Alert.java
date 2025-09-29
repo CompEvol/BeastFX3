@@ -187,7 +187,7 @@ public class Alert {
 		String original = html;
 		html = html.replaceAll("<br>", "\n");
 		html = html.replaceAll("<br/>", "\n");
-		html = "<tag>" + html + "<tag>";
+		html = "<tag>" + html + "</tag>";
         final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document doc;
         try {

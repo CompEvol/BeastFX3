@@ -55,6 +55,9 @@
 				<provider classname="beastfx.app.beauti.StateNodeInitialiserListInputEditor"/>
 				<provider classname="beastfx.app.beauti.StateNodeListInputEditor"/>
 				<provider classname="beastfx.app.beauti.TreeDistributionInputEditor"/>
+
+				<provider classname="beastfx.app.inputeditor.spec.SiteModelInputEditor"/>
+
 <!--
 -->				
 			</service>

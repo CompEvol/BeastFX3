@@ -1,4 +1,5 @@
-package beastfx.app.inputeditor;
+package beastfx.app.inputeditor.spec;
+
 
 
 
@@ -8,12 +9,16 @@ import beast.base.core.BEASTInterface;
 import beast.base.core.Input;
 import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.likelihood.GenericTreeLikelihood;
-import beast.base.evolution.sitemodel.SiteModel;
+import beast.base.spec.evolution.sitemodel.SiteModel;
 import beast.base.evolution.sitemodel.SiteModelInterface;
 import beast.base.inference.*;
-import beast.base.inference.operator.kernel.BactrianDeltaExchangeOperator;
-import beast.base.inference.parameter.IntegerParameter;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.inference.operator.DeltaExchangeOperator;
+import beast.base.spec.parameter.IntegerParameter;
+import beast.base.spec.domain.NonNegativeReal;
+import beast.base.spec.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.type.RealScalar;
+import beastfx.app.inputeditor.*;
 import beastfx.app.util.FXUtils;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -35,7 +40,7 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
 
     // vars for dealing with mean-rate delta exchange operator
     CheckBox fixMeanRatesCheckBox;
-    BactrianDeltaExchangeOperator operator;
+    DeltaExchangeOperator operator;
     protected SmallLabel fixMeanRatesValidateLabel;
 
 	public SiteModelInputEditor() {
@@ -66,9 +71,9 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
 					// set up relative weights
 					setUpOperator();
 			});
-    	operator = (BactrianDeltaExchangeOperator) doc.pluginmap.get("FixMeanMutationRatesOperator");
+    	operator = (DeltaExchangeOperator) doc.pluginmap.get("FixMeanMutationRatesOperator");
     	if (operator == null) {
-    		operator = new BactrianDeltaExchangeOperator();
+    		operator = new DeltaExchangeOperator();
     		try {
     			operator.setID("FixMeanMutationRatesOperator");
 				operator.initByName("weight", 2.0, "delta", 0.75);
@@ -159,7 +164,7 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
 			public void validateInput() {
         		super.validateInput();
             	SiteModel sitemodel = (SiteModel) m_beastObject; 
-                if (sitemodel.gammaCategoryCount.get() < 2 && sitemodel.shapeParameterInput.get().isEstimatedInput.get()) {
+                if (sitemodel.gammaCategoryCount.get() < 2 && ((StateNode)sitemodel.shapeParameterInput.get()).isEstimatedInput.get()) {
                 	m_validateLabel.setColor("orange");
                 	m_validateLabel.setTooltip(new Tooltip("shape parameter is estimated, but not used"));
                 	m_validateLabel.setVisible(true);
@@ -197,20 +202,20 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
             int categoryCount = Integer.parseInt(categories);
             SiteModel s = (SiteModel) m_input.get();
             s.getInput("gammaCategoryCount").setValue(categoryCount, s);
-        	RealParameter shapeParameter = ((SiteModel) m_input.get()).shapeParameterInput.get();
+        	RealScalar<PositiveReal> shapeParameter = ((SiteModel) m_input.get()).shapeParameterInput.get();
             if (!gammaShapeEditor.getComponent().isVisible() && categoryCount >= 2) {
             	// we are flipping from no gamma to gamma heterogeneity accross sites
             	// so set the estimate flag on the shape parameter
-            	shapeParameter.isEstimatedInput.setValue(true, shapeParameter);            	
+            	((StateNode)shapeParameter).isEstimatedInput.setValue(true, (BEASTInterface) shapeParameter);            	
             } else if (gammaShapeEditor.getComponent().isVisible() && categoryCount < 2) {
             	// we are flipping from with gamma to no gamma heterogeneity accross sites
             	// so unset the estimate flag on the shape parameter
-            	shapeParameter.isEstimatedInput.setValue(false, shapeParameter);            	
+            	((StateNode)shapeParameter).isEstimatedInput.setValue(false, (BEASTInterface) shapeParameter);            	
             }
             Object o = ((ParameterInputEditor)gammaShapeEditor).getComponent();
             if (o instanceof ParameterInputEditor) {
 	            ParameterInputEditor e = (ParameterInputEditor) o;
-	            e.m_isEstimatedBox.setSelected(shapeParameter.isEstimatedInput.get());
+	            e.m_isEstimatedBox.setSelected(((StateNode)shapeParameter).isEstimatedInput.get());
             }
             gammaShapeEditor.getComponent().setVisible(categoryCount >= 2);
             gammaShapeEditor.getComponent().setManaged(categoryCount >= 2);
@@ -237,13 +242,13 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
 
 			@Override
             public void validateInput() {
-				RealParameter p = (RealParameter) m_input.get();
-				if (p.isEstimatedInput.get() && p.valuesInput.get().get(0) <= 0.0) {
+				RealScalar<NonNegativeReal> p = (RealScalar<NonNegativeReal>) m_input.get();
+				if ((p instanceof StateNode sn) && sn.isEstimatedInput.get() && p.get() <= 0.0) {
                     m_validateLabel.setVisible(true);
                     m_validateLabel.setTooltip(new Tooltip("Proportion invariant should be non-zero when estimating"));
                     return;
 				}
-				if (p.valuesInput.get().get(0) < 0.0 || p.valuesInput.get().get(0) >= 1.0) {
+				if (p.get() < 0.0 || p.get() >= 1.0) {
                     m_validateLabel.setVisible(true);
                     m_validateLabel.setTooltip(new Tooltip("Proportion invariant should be from 0 to 1 (exclusive 1)"));
                     return;
@@ -257,8 +262,9 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
     }
 
     public static boolean customConnector(BeautiDoc doc) {
+System.err.println("SiteModelInputEditor::customConnector() called");
  		try {
- 			BactrianDeltaExchangeOperator operator = (BactrianDeltaExchangeOperator) doc.pluginmap.get("FixMeanMutationRatesOperator");
+ 			DeltaExchangeOperator operator = (DeltaExchangeOperator) doc.pluginmap.get("FixMeanMutationRatesOperator");
  	        if (operator == null) {
  	        	return false;
  	        }
@@ -279,16 +285,16 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
 	    		}
 	    		if (treelikelihood.siteModelInput.get() instanceof SiteModel) {
 		    		SiteModel siteModel = (SiteModel) treelikelihood.siteModelInput.get();
-		    		RealParameter mutationRate = siteModel.muParameterInput.get();
+		    		RealScalar<PositiveReal> mutationRate = siteModel.muParameterInput.get();
 		    		//clockRate.m_bIsEstimated.setValue(true, clockRate);
-		    		if (mutationRate.isEstimatedInput.get()) {
+		    		if (((StateNode)mutationRate).isEstimatedInput.get()) {
 		    			hasOneEstimatedRate = true;
-		    			if (rateIDs.indexOf(mutationRate.getID()) == -1) {
-			    			parameters.add(mutationRate);
+		    			if (rateIDs.indexOf(((BEASTInterface)mutationRate).getID()) == -1) {
+			    			parameters.add((RealParameter)mutationRate);
 			    			weights.add(weight);
-			    			rateIDs.add(mutationRate.getID());
+			    			rateIDs.add(((BEASTInterface)mutationRate).getID());
 		    			} else {
-		    				int k = rateIDs.indexOf(mutationRate.getID());
+		    				int k = rateIDs.indexOf(((BEASTInterface)mutationRate).getID());
 			    			weights.set(k,  weights.get(k) + weight);
 		    			}
 		    		}
@@ -318,7 +324,7 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
     }
     
     public static boolean avmnConnector(BeautiDoc doc) {
-    	// System.err.println("SiteModelInputEditor::avmnConnector() called");
+System.err.println("SiteModelInputEditor::avmnConnector() called");
     	return AVMNConnector.customConnector(doc);
     }
 
@@ -341,13 +347,13 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
     				GenericTreeLikelihood treelikelihood = (GenericTreeLikelihood) d;
     	    		if (treelikelihood.siteModelInput.get() instanceof SiteModel) {
     		    		SiteModel siteModel = (SiteModel) treelikelihood.siteModelInput.get();
-    		    		RealParameter mutationRate = siteModel.muParameterInput.get();
+    		    		RealScalar<PositiveReal> mutationRate = siteModel.muParameterInput.get();
     		    		//clockRate.m_bIsEstimated.setValue(true, clockRate);
-    		    		if (mutationRate.isEstimatedInput.get()) {
+    		    		if (((StateNode)mutationRate).isEstimatedInput.get()) {
     		    			if (commonClockRate < 0) {
-    		    				commonClockRate = mutationRate.valuesInput.get().get(0);
+    		    				commonClockRate = mutationRate.get();
     		    			} else {
-    		    				if (Math.abs(commonClockRate - mutationRate.valuesInput.get().get(0)) > 1e-10) {
+    		    				if (Math.abs(commonClockRate - mutationRate.get()) > 1e-10) {
     		    					isAllClocksAreEqual = false;
     		    				}
     		    			}
