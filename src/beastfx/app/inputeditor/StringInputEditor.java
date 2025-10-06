@@ -18,7 +18,7 @@ public class StringInputEditor extends InputEditor.Base {
 
 
     @Override
-    void setUpEntry() {
+    protected void setUpEntry() {
         super.setUpEntry();
         m_entry.setPrefWidth(500);
         //Dimension size = new Dimension(200,20);

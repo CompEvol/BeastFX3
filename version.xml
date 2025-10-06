@@ -57,6 +57,7 @@
 				<provider classname="beastfx.app.beauti.TreeDistributionInputEditor"/>
 
 				<provider classname="beastfx.app.inputeditor.spec.SiteModelInputEditor"/>
+				<provider classname="beastfx.app.inputeditor.spec.ScalarInputEditor"/>
 
 <!--
 -->				

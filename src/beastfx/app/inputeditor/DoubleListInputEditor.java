@@ -165,7 +165,7 @@ public class DoubleListInputEditor extends ListInputEditor {
         } // init
 
         @Override
-		void setUpEntry() {
+		protected void setUpEntry() {
             m_entry = new TextField();
             m_entry.setId(m_input.getName());
 //            int size = m_entry.getFont().getSize();

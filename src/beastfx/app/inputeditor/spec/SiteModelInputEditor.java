@@ -12,10 +12,11 @@ import beast.base.evolution.likelihood.GenericTreeLikelihood;
 import beast.base.spec.evolution.sitemodel.SiteModel;
 import beast.base.evolution.sitemodel.SiteModelInterface;
 import beast.base.inference.*;
-import beast.base.spec.inference.operator.DeltaExchangeOperator;
-import beast.base.spec.inference.parameter.IntegerParameter;
+import beast.base.spec.inference.operator.deltaexchange.CompoundRealDeltaExchangeOperator;
 import beast.base.spec.domain.NonNegativeReal;
-import beast.base.spec.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveInt;
+import beast.base.spec.inference.parameter.IntVectorParam;
+import beast.base.spec.inference.parameter.RealScalarParam;
 import beast.base.spec.domain.PositiveReal;
 import beast.base.spec.type.RealScalar;
 import beastfx.app.inputeditor.*;
@@ -36,11 +37,11 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
     IntegerInputEditor categoryCountEditor;
     TextField categoryCountEntry;
     InputEditor gammaShapeEditor;
-    ParameterInputEditor inVarEditor;
+    ScalarInputEditor inVarEditor;
 
     // vars for dealing with mean-rate delta exchange operator
     CheckBox fixMeanRatesCheckBox;
-    DeltaExchangeOperator operator;
+    CompoundRealDeltaExchangeOperator operator;
     protected SmallLabel fixMeanRatesValidateLabel;
 
 	public SiteModelInputEditor() {
@@ -71,9 +72,9 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
 					// set up relative weights
 					setUpOperator();
 			});
-    	operator = (DeltaExchangeOperator) doc.pluginmap.get("FixMeanMutationRatesOperator");
+    	operator = (CompoundRealDeltaExchangeOperator) doc.pluginmap.get("FixMeanMutationRatesOperator");
     	if (operator == null) {
-    		operator = new DeltaExchangeOperator();
+    		operator = new CompoundRealDeltaExchangeOperator();
     		try {
     			operator.setID("FixMeanMutationRatesOperator");
 				operator.initByName("weight", 2.0, "delta", 0.75);
@@ -145,7 +146,7 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
     public InputEditor createMutationRateEditor() {
     	SiteModel sitemodel = ((SiteModel) m_input.get()); 
         final Input<?> input = sitemodel.muParameterInput;
-        ParameterInputEditor mutationRateEditor = new ParameterInputEditor(doc);
+        ScalarInputEditor mutationRateEditor = new ScalarInputEditor(doc);
         mutationRateEditor.init(input, sitemodel, -1, ExpandOption.FALSE, true);
         mutationRateEditor.getEntry().setDisable(doc.autoUpdateFixMeanSubstRate);
         mutationRateEditor.m_isEstimatedBox.setOnAction(e -> {
@@ -212,9 +213,9 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
             	// so unset the estimate flag on the shape parameter
             	((StateNode)shapeParameter).isEstimatedInput.setValue(false, (BEASTInterface) shapeParameter);            	
             }
-            Object o = ((ParameterInputEditor)gammaShapeEditor).getComponent();
-            if (o instanceof ParameterInputEditor) {
-	            ParameterInputEditor e = (ParameterInputEditor) o;
+            Object o = ((ScalarInputEditor)gammaShapeEditor).getComponent();
+            if (o instanceof ScalarInputEditor) {
+	            ScalarInputEditor e = (ScalarInputEditor) o;
 	            e.m_isEstimatedBox.setSelected(((StateNode)shapeParameter).isEstimatedInput.get());
             }
             gammaShapeEditor.getComponent().setVisible(categoryCount >= 2);
@@ -238,7 +239,7 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
 
     public InputEditor createProportionInvariantEditor() {
         final Input<?> input = ((SiteModel) m_input.get()).invarParameterInput;
-        inVarEditor = new ParameterInputEditor(doc) {
+        inVarEditor = new ScalarInputEditor(doc) {
 
 			@Override
             public void validateInput() {
@@ -264,12 +265,12 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
     public static boolean customConnector(BeautiDoc doc) {
 System.err.println("SiteModelInputEditor::customConnector() called");
  		try {
- 			DeltaExchangeOperator operator = (DeltaExchangeOperator) doc.pluginmap.get("FixMeanMutationRatesOperator");
+ 			CompoundRealDeltaExchangeOperator operator = (CompoundRealDeltaExchangeOperator) doc.pluginmap.get("FixMeanMutationRatesOperator");
  	        if (operator == null) {
  	        	return false;
  	        }
 
- 	       	List<RealParameter> parameters = operator.parameterInput.get();
+ 	       	List<RealScalarParam<?>> parameters = operator.parameterInput.get();
  	    	parameters.clear();
 		   	//String weights = "";
 		    CompoundDistribution likelihood = (CompoundDistribution) doc.pluginmap.get("likelihood");
@@ -290,7 +291,7 @@ System.err.println("SiteModelInputEditor::customConnector() called");
 		    		if (((StateNode)mutationRate).isEstimatedInput.get()) {
 		    			hasOneEstimatedRate = true;
 		    			if (rateIDs.indexOf(((BEASTInterface)mutationRate).getID()) == -1) {
-			    			parameters.add((RealParameter)mutationRate);
+			    			parameters.add((RealScalarParam<?>)mutationRate);
 			    			weights.add(weight);
 			    			rateIDs.add(((BEASTInterface)mutationRate).getID());
 		    			} else {
@@ -302,15 +303,16 @@ System.err.println("SiteModelInputEditor::customConnector() called");
 	    	}
 			
 			
-		    IntegerParameter weightParameter;
+			IntVectorParam<?> weightParameter;
 			if (weights.size() == 0) {
-		    	weightParameter = new IntegerParameter();
+		    	weightParameter = new IntVectorParam<>();
 			} else {
-				String weightString = "";
+				int [] weightValues = new int[weights.size()];
+				int i = 0;
 				for (int k : weights) {
-					weightString += k + " ";
+					weightValues[i++] = k;
 				}
-		    	weightParameter = new IntegerParameter(weightString);
+		    	weightParameter = new IntVectorParam<>(weightValues, PositiveInt.INSTANCE);
 				weightParameter.setID("weightparameter");
 				
 			}
@@ -365,7 +367,7 @@ System.err.println("SiteModelInputEditor::avmnConnector() called");
     			
     		}
    		
-    		List<RealParameter> parameters = operator.parameterInput.get();
+    		List<RealScalarParam<?>> parameters = operator.parameterInput.get();
 	    	if (!fixMeanRatesCheckBox.isSelected()) {
 	    		fixMeanRatesValidateLabel.setVisible(false);
 				repaint();

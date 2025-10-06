@@ -1,4 +1,4 @@
-package beastfx.app.inputeditor;
+package beastfx.app.inputeditor.spec;
 
 
 
@@ -8,9 +8,17 @@ import beast.base.core.Log;
 import beast.base.evolution.branchratemodel.BranchRateModel;
 import beast.base.inference.Distribution;
 import beast.base.inference.Operator;
+import beast.base.inference.StateNode;
 import beast.base.inference.distribution.ParametricDistribution;
-import beast.base.inference.parameter.Parameter;
 import beast.base.parser.PartitionContext;
+import beast.base.spec.inference.parameter.BoolScalarParam;
+import beast.base.spec.inference.parameter.IntScalarParam;
+import beast.base.spec.inference.parameter.RealScalarParam;
+import beast.base.spec.type.Scalar;
+import beastfx.app.inputeditor.BEASTObjectDialog;
+import beastfx.app.inputeditor.BEASTObjectInputEditor;
+import beastfx.app.inputeditor.BEASTObjectPanel;
+import beastfx.app.inputeditor.BeautiDoc;
 import beastfx.app.util.Alert;
 import beastfx.app.util.FXUtils;
 import javafx.geometry.Insets;
@@ -27,13 +35,13 @@ import java.util.List;
 
 
 
-public class ParameterInputEditor extends BEASTObjectInputEditor {
+public class ScalarInputEditor extends BEASTObjectInputEditor {
 	boolean isParametricDistributionParameter = false;
 	
-    public ParameterInputEditor() {
+    public ScalarInputEditor() {
     	super();
     }
-    public ParameterInputEditor(BeautiDoc doc) {
+    public ScalarInputEditor(BeautiDoc doc) {
 		super(doc);
 	}
 
@@ -41,7 +49,12 @@ public class ParameterInputEditor extends BEASTObjectInputEditor {
 
     @Override
     public Class<?> type() {
-        return Parameter.Base.class;
+        return Scalar.class;
+    }
+    
+    @Override
+    public Class<?>[] types() {
+    	return new Class<?>[] {RealScalarParam.class, IntScalarParam.class, BoolScalarParam.class};
     }
     
     
@@ -56,18 +69,14 @@ public class ParameterInputEditor extends BEASTObjectInputEditor {
     protected void initEntry() {
         if (m_input.get() != null) {
         	if (itemNr < 0) {
-        		Parameter.Base<?> parameter = (Parameter.Base<?>) m_input.get();
+        		Scalar parameter = (Scalar) m_input.get();
         		String s = "";
-        		for (Object d : parameter.valuesInput.get()) {
-        			s += d + " ";
-        		}
+        		s += parameter.get() + " ";
         		m_entry.setText(s);
         	} else {
-        		Parameter.Base<?> parameter = (Parameter.Base<?>) ((List<?>)m_input.get()).get(itemNr);
+        		Scalar parameter = (Scalar) ((List<?>)m_input.get()).get(itemNr);
         		String s = "";
-        		for (Object d : parameter.valuesInput.get()) {
-        			s += d + " ";
-        		}
+        		s += parameter.get() + " ";
         		m_entry.setText(s);
         	}
         }
@@ -77,21 +86,17 @@ public class ParameterInputEditor extends BEASTObjectInputEditor {
     protected void processEntry() {
         try {
             String valueString = m_entry.getText();
-            Parameter.Base<?> parameter = (Parameter.Base<?>) m_input.get();
+            Scalar parameter = (Scalar) m_input.get();
         	String oldValue = "";
-    		for (Object d : parameter.valuesInput.get()) {
-    			oldValue += d + " ";
+    		oldValue += parameter.get() + "";
+    		
+    		if (parameter instanceof RealScalarParam r) {
+    			r.set(Double.valueOf(valueString));
+    		} else if (parameter instanceof IntScalarParam i) {
+    			i.set(Integer.valueOf(valueString));
+    		} else if (parameter instanceof BoolScalarParam b) {
+    			b.set(Boolean.valueOf(valueString));
     		}
-            int oldDim = parameter.getDimension();
-            parameter.valuesInput.setValue(valueString, parameter);
-            parameter.initAndValidate();
-            int newDim = parameter.getDimension();
-            if (oldDim != newDim) {
-            	parameter.setDimension(oldDim);
-                parameter.valuesInput.setValue(oldValue, parameter);
-                parameter.initAndValidate();
-                throw new IllegalArgumentException("Entry caused change in dimension");
-            }
             validateInput();
         } catch (Exception ex) {
             m_validateLabel.setVisible(true);
@@ -105,11 +110,11 @@ public class ParameterInputEditor extends BEASTObjectInputEditor {
     @Override
     protected void addComboBox(Pane box, Input<?> input, BEASTInterface beastObject) {
         HBox paramBox = FXUtils.newHBox();
-        Parameter.Base<?> parameter = null;
+        Scalar parameter = null;
         if (itemNr >= 0) {
-        	parameter = (Parameter.Base<?>) ((List<?>) input.get()).get(itemNr);
+        	parameter = (Scalar) ((List<?>) input.get()).get(itemNr);
         } else {
-        	parameter = (Parameter.Base<?>) input.get();
+        	parameter = (Scalar) input.get();
         }
 
         if (parameter == null) {
@@ -167,7 +172,7 @@ public class ParameterInputEditor extends BEASTObjectInputEditor {
             
             // paramBox.getChildren().add(new Separator());
 
-            m_isEstimatedBox = new CheckBox(doc.beautiConfig.getInputLabel(parameter, parameter.isEstimatedInput.getName()));
+            m_isEstimatedBox = new CheckBox(doc.beautiConfig.getInputLabel((BEASTInterface)parameter, ((StateNode)parameter).isEstimatedInput.getName()));
             m_isEstimatedBox.setId(input.getName() + ".isEstimated");
             //((HBox)box).setHgrow(m_isEstimatedBox, Priority.ALWAYS);
             m_isEstimatedBox.setMaxWidth(Double.POSITIVE_INFINITY);
@@ -175,12 +180,12 @@ public class ParameterInputEditor extends BEASTObjectInputEditor {
             box.setMaxWidth(Double.POSITIVE_INFINITY);
 
             if (input.get() != null) {
-                m_isEstimatedBox.setSelected(parameter.isEstimatedInput.get());
+                m_isEstimatedBox.setSelected(((StateNode)parameter).isEstimatedInput.get());
             }
-            m_isEstimatedBox.setTooltip(new Tooltip(parameter.isEstimatedInput.getTipText()));
+            m_isEstimatedBox.setTooltip(new Tooltip(((StateNode)parameter).isEstimatedInput.getTipText()));
 
             boolean isClockRate = false;
-            for (Object output : parameter.getOutputs()) {
+            for (Object output : ((BEASTInterface)parameter).getOutputs()) {
                 if (output instanceof BranchRateModel.Base) {
                     isClockRate |= ((BranchRateModel.Base) output).meanRateInput.get() == parameter;
                 }
@@ -235,7 +240,7 @@ public class ParameterInputEditor extends BEASTObjectInputEditor {
     
     public void toggleEstimate() {
     	try {
-            Parameter.Base<?> parameter2 = (Parameter.Base<?>) m_input.get();
+            StateNode parameter2 = (StateNode) m_input.get();
             parameter2.isEstimatedInput.setValue(m_isEstimatedBox.isSelected(), parameter2);
             if (isParametricDistributionParameter) {
             	if (m_isEstimatedBox.isSelected()) {
@@ -297,13 +302,11 @@ public class ParameterInputEditor extends BEASTObjectInputEditor {
 
     @Override
     protected void refresh() {
-        Parameter.Base<?> parameter = (Parameter.Base<?>) m_input.get();
+        Scalar parameter = (Scalar) m_input.get();
 		String s = "";
-		for (Object d : parameter.valuesInput.get()) {
-			s += d + " ";
-		}
+		s += parameter.get() + " ";
 		m_entry.setText(s);
-        m_isEstimatedBox.setSelected(parameter.isEstimatedInput.get());
+        m_isEstimatedBox.setSelected(((StateNode)parameter).isEstimatedInput.get());
         repaint();
     }
 

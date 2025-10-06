@@ -184,18 +184,10 @@ public class Alert {
 	}
 
 	private static String removeHTML(String html) {
-		String original = html;
+		html = "<tag>" + html + "</tag>";
 		html = html.replaceAll("<br>", "\n");
 		html = html.replaceAll("<br/>", "\n");
-		html = "<tag>" + html + "</tag>";
-        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document doc;
-        try {
-			doc = factory.newDocumentBuilder().parse(new InputSource(new StringReader(html)));
-		} catch (SAXException | IOException | ParserConfigurationException e) {
-			return original;
-		}
-		String text = doc.getTextContent();
+		String text = html.replaceAll("<[^>]+>", "");
 		return text;
 	}
 	

@@ -26,7 +26,7 @@ import javafx.scene.paint.Color;
 
 public class BEASTObjectInputEditor extends InputEditor.Base {
     ComboBox<Object> m_selectBEASTObjectBox;
-    Button m_editBEASTObjectButton;
+    protected Button m_editBEASTObjectButton;
 
     BEASTObjectInputEditor _this;
 
@@ -128,7 +128,7 @@ public class BEASTObjectInputEditor extends InputEditor.Base {
         return m_editBEASTObjectButton;
 	}
 
-	void refresh() {
+	protected void refresh() {
     	if (m_selectBEASTObjectBox != null) {
 	        String oldID = (String) m_selectBEASTObjectBox.getValue();
 	        String id = ((BEASTInterface) m_input.get()).getID();

@@ -225,7 +225,7 @@ public abstract class Base extends Pane implements InputEditor {
     } // init
     
  
-    void setUpEntry() {
+    protected void setUpEntry() {
         m_entry = new TextField();
         m_entry.setId(m_input.getName());
         Dimension2D prefDim = new Dimension2D(PREFERRED_SIZE.getWidth(), m_entry.getPrefHeight());

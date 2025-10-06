@@ -255,9 +255,9 @@ ClusterTree/clusterType/,
             <!-- site model                                                              -->
             <plugin spec='beast.base.spec.evolution.sitemodel.SiteModel' id="SiteModel.s:$(n)" gammaCategoryCount='0'>
                 <!--substModel will be automatically detected /-->
-                <proportionInvariant spec="beast.base.spec.parameter.RealScalarParam" domain="NonNegativeReal" id='proportionInvariant.s:$(n)' value='0.0' lower='0' upper='1' estimate='false'/>
-                <mutationRate        spec="beast.base.spec.parameter.RealScalarParam" domain="PositiveReal" id='mutationRate.s:$(n)' value='1.0' lower="0.0" estimate='false'/>
-                <shape               spec="beast.base.spec.parameter.RealScalarParam" domain="PositiveReal" id='gammaShape.s:$(n)' value='1.0' lower="0.1" estimate='false'/>
+                <proportionInvariant spec="beast.base.spec.inference.parameter.RealScalarParam" domain="NonNegativeReal" id='proportionInvariant.s:$(n)' value='0.0' lower='0' upper='1' estimate='false'/>
+                <mutationRate        spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" id='mutationRate.s:$(n)' value='1.0' lower="0.0" estimate='false'/>
+                <shape               spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" id='gammaShape.s:$(n)' value='1.0' lower="0.1" estimate='false'/>
             </plugin>
 
             <plugin spec='ThreadedTreeLikelihood' id="treeLikelihood.$(n)">
@@ -270,7 +270,7 @@ ClusterTree/clusterType/,
             </plugin>
 
 	        <prior id='ClockPrior.c:$(n)' x='@clockRate.c:$(n)'><distr spec="beast.base.inference.distribution.Uniform" upper='Infinity'/></prior>
-            <prior id='MutationRatePrior.s:$(n)' scalar='@mutationRate.s:$(n)'><distr spec="OneOnX"/></prior>
+            <prior id='MutationRatePrior.s:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@mutationRate.s:$(n)'><distr spec="OneOnX"/></prior>
 
             <!-- tree and its properties -->
             <taxonset id='TaxonSet.$(n)' spec='beast.base.evolution.alignment.TaxonSet' alignment='@$(n)' />
@@ -310,8 +310,8 @@ ClusterTree/clusterType/,
 
 
             <prior id='YuleBirthRatePrior.t:$(n)' x='@birthRate.t:$(n)'><distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='Infinity'/></prior>
-            <prior id='GammaShapePrior.s:$(n)' scalar='@gammaShape.s:$(n)'><distr spec="beast.base.inference.distribution.Exponential" mean='1'/></prior>
-            <prior id='PropInvariantPrior.s:$(n)' scalar='@proportionInvariant.s:$(n)'><distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='1'/></prior>
+            <prior id='GammaShapePrior.s:$(n)'  spec="beast.base.spec.inference.distribution.Prior" scalar='@gammaShape.s:$(n)'><distr spec="beast.base.inference.distribution.Exponential" mean='1'/></prior>
+            <prior id='PropInvariantPrior.s:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@proportionInvariant.s:$(n)'><distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='1'/></prior>
   		    <operator id='YuleBirthRateScaler.t:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.75" weight="3" parameter="@birthRate.t:$(n)"/>
 
 
@@ -350,23 +350,28 @@ ClusterTree/clusterType/,
 				</operator>
     	    </operator>
 
+<!--
         	<operator id="proportionInvariantScaler.s:$(n)" spec="beast.base.evolution.operator.AdaptableOperatorSampler" weight="0.05">
                 <parameter idref="proportionInvariant.s:$(n)"/>
             	<operator idref="AVMNOperator.$(n)"/>
-            	<operator id='proportionInvariantScalerX.s:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@proportionInvariant.s:$(n)"/>
+            	<operator id='proportionInvariantScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@proportionInvariant.s:$(n)"/>
         	</operator>
 
         	<operator id="mutationRateScaler.s:$(n)" spec="beast.base.evolution.operator.AdaptableOperatorSampler" weight="0.05">
                 <parameter idref="mutationRate.s:$(n)"/>
             	<operator idref="AVMNOperator.$(n)"/>
-	            <operator id='mutationRateScalerX.s:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@mutationRate.s:$(n)"/>
+            	<operator id='mutationRateScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@mutationRate.s:$(n)"/>
         	</operator>
 
         	<operator id="gammaShapeScaler.s:$(n)" spec="beast.base.evolution.operator.AdaptableOperatorSampler" weight="0.05">
                 <parameter idref="gammaShape.s:$(n)"/>
             	<operator idref="AVMNOperator.$(n)"/>
-	            <operator id='gammaShapeScalerX.s:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@gammaShape.s:$(n)"/>
+            	<operator id='gammaShapeScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@gammaShape.s:$(n)"/>
         	</operator>
+-->        	
+            <operator id='proportionInvariantScaler.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@proportionInvariant.s:$(n)"/>
+            <operator id='mutationRateScaler.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@mutationRate.s:$(n)"/>
+            <operator id='gammaShapeScaler.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@gammaShape.s:$(n)"/>
 
 
 
@@ -394,10 +399,11 @@ ClusterTree/clusterType/,
             <connect srcID='birthRate.t:$(n)'                 targetID='state' inputName='stateNode' if='inposterior(YuleModel.t:$(n)) and inposterior(Tree.t:$(n)) and birthRate.t:$(n)/estimate=true'/>
 
             <connect srcID='Tree.t:$(n)'                      targetID='AVMNNoTransform.$(n)' inputName='f' if='inposterior(Tree.t:$(n)) and Tree.t:$(n)/estimate=true'/>
+<!-->            
             <connect srcID='proportionInvariant.s:$(n)'       targetID='AVMNLogTransform.$(n)' inputName='f' if='inlikelihood(proportionInvariant.s:$(n)) and proportionInvariant.s:$(n)/estimate=true'/>
             <connect srcID='mutationRate.s:$(n)'              targetID='AVMNLogTransform.$(n)' inputName='f' if='nooperator(FixMeanMutationRatesOperator) and inlikelihood(mutationRate.s:$(n)) and mutationRate.s:$(n)/estimate=true'/>
             <connect srcID='gammaShape.s:$(n)'                targetID='AVMNLogTransform.$(n)' inputName='f' if='inlikelihood(gammaShape.s:$(n)) and gammaShape.s:$(n)/estimate=true'/>
-
+-->
 
             <connect srcID='proportionInvariantScaler.s:$(n)' targetID='mcmc' inputName='operator' if='inlikelihood(proportionInvariant.s:$(n)) and proportionInvariant.s:$(n)/estimate=true'>Scales proportion of invariant sites parameter of partition $(n)</connect>
             <connect srcID='mutationRateScaler.s:$(n)'        targetID='mcmc' inputName='operator' if='nooperator(FixMeanMutationRatesOperator) and inlikelihood(mutationRate.s:$(n)) and mutationRate.s:$(n)/estimate=true'>Scales mutation rate of partition s:$(n)</connect>
@@ -411,10 +417,6 @@ ClusterTree/clusterType/,
 
             <connect srcID='allTipDatesRandomWalker.t:$(n)'   targetID='mcmc' inputName='operator' if='inposterior(Tree.t:$(n)) and Tree.t:$(n)/estimate=true and allTipDatesRandomWalker.t:$(n)/weight!=0.0'>Estimates tip dates for tree t:$(n)</connect>
 
-<!--
-			TreeScaler is replaced with more efficient BICESPS operators.
-            <connect srcID="YuleModelTreeScaler.t:$(n)"       targetID="mcmc" inputName="operator" if="inposterior(YuleModel.t:$(n)) and Tree.t:$(n)/estimate=true" >Scales all internal nodes for tree t:$(n)</connect>
--->
             <connect srcID="YuleModelTreeRootScaler.t:$(n)"   targetID="mcmc" inputName="operator" if="inposterior(YuleModel.t:$(n)) and Tree.t:$(n)/estimate=true" >Scales root node for tree t:$(n)</connect>
             <connect srcID="YuleModelUniformOperator.t:$(n)"  targetID="mcmc" inputName="operator" if="inposterior(YuleModel.t:$(n)) and Tree.t:$(n)/estimate=true" >Draws new internal node heights uniformally for tree t:$(n)</connect>
             <connect srcID="YuleModelSubtreeSlide.t:$(n)"     targetID="mcmc" inputName="operator" if="inposterior(YuleModel.t:$(n)) and Tree.t:$(n)/estimate=true" >Performs subtree slide rearrangement of tree t:$(n)</connect>
