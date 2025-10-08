@@ -5,6 +5,7 @@ package beastfx.app.inputeditor.spec;
 
 
 
+
 import beast.base.core.BEASTInterface;
 import beast.base.core.Input;
 import beast.base.evolution.alignment.Alignment;
@@ -12,13 +13,14 @@ import beast.base.evolution.likelihood.GenericTreeLikelihood;
 import beast.base.spec.evolution.sitemodel.SiteModel;
 import beast.base.evolution.sitemodel.SiteModelInterface;
 import beast.base.inference.*;
-import beast.base.spec.inference.operator.deltaexchange.CompoundRealDeltaExchangeOperator;
 import beast.base.spec.domain.NonNegativeReal;
 import beast.base.spec.domain.PositiveInt;
+import beast.base.spec.inference.operator.DeltaExchangeOperator;
 import beast.base.spec.inference.parameter.IntVectorParam;
 import beast.base.spec.inference.parameter.RealScalarParam;
 import beast.base.spec.domain.PositiveReal;
 import beast.base.spec.type.RealScalar;
+import beast.base.spec.type.Tensor;
 import beastfx.app.inputeditor.*;
 import beastfx.app.util.FXUtils;
 import javafx.scene.Node;
@@ -41,7 +43,7 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
 
     // vars for dealing with mean-rate delta exchange operator
     CheckBox fixMeanRatesCheckBox;
-    CompoundRealDeltaExchangeOperator operator;
+    DeltaExchangeOperator.G operator;
     protected SmallLabel fixMeanRatesValidateLabel;
 
 	public SiteModelInputEditor() {
@@ -72,9 +74,9 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
 					// set up relative weights
 					setUpOperator();
 			});
-    	operator = (CompoundRealDeltaExchangeOperator) doc.pluginmap.get("FixMeanMutationRatesOperator");
+    	operator = (DeltaExchangeOperator.G) doc.pluginmap.get("FixMeanMutationRatesOperator");
     	if (operator == null) {
-    		operator = new CompoundRealDeltaExchangeOperator();
+    		operator = new DeltaExchangeOperator().new G();
     		try {
     			operator.setID("FixMeanMutationRatesOperator");
 				operator.initByName("weight", 2.0, "delta", 0.75);
@@ -265,12 +267,12 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
     public static boolean customConnector(BeautiDoc doc) {
 System.err.println("SiteModelInputEditor::customConnector() called");
  		try {
- 			CompoundRealDeltaExchangeOperator operator = (CompoundRealDeltaExchangeOperator) doc.pluginmap.get("FixMeanMutationRatesOperator");
+ 			DeltaExchangeOperator.G operator = (DeltaExchangeOperator.G) doc.pluginmap.get("FixMeanMutationRatesOperator");
  	        if (operator == null) {
  	        	return false;
  	        }
 
- 	       	List<RealScalarParam<?>> parameters = operator.parameterInput.get();
+ 	       	List<Tensor<?,?>> parameters = operator.parameterInput.get();
  	    	parameters.clear();
 		   	//String weights = "";
 		    CompoundDistribution likelihood = (CompoundDistribution) doc.pluginmap.get("likelihood");
@@ -367,7 +369,7 @@ System.err.println("SiteModelInputEditor::avmnConnector() called");
     			
     		}
    		
-    		List<RealScalarParam<?>> parameters = operator.parameterInput.get();
+    		List<Tensor<?,?>> parameters = operator.parameterInput.get();
 	    	if (!fixMeanRatesCheckBox.isSelected()) {
 	    		fixMeanRatesValidateLabel.setVisible(false);
 				repaint();
