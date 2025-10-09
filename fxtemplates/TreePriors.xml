@@ -40,7 +40,7 @@
     <!-- tree priors -->
     <mergewith point='treePriorTemplates'>
         <!-- Yule -->
-        <subtemplate id='YuleModel' class='beast.base.evolution.speciation.YuleModel' mainid='YuleModel.t:$(n)' hmc='
+        <subtemplate id='YuleModel' class='beast.base.spec.evolution.speciation.YuleModel' mainid='YuleModel.t:$(n)' hmc='
 YuleModelUniformOperator/index/=Operators/BactrianNodeOperator/,
 YuleModelSubtreeSlide/index/=Operators/SubtreeSlide/,
 YuleModelNarrow/index/=Operators/Exchange/,
@@ -54,13 +54,13 @@ YuleBirthRateScaler/index/=Operators/BactrianRateScaler/,
 YuleBirthRatePrior/index/=Priors/YuleBirthRatePrior/
 '>
             <![CDATA[
-            <plugin spec='YuleModel' id="YuleModel.t:$(n)" tree='@Tree.t:$(n)'>
-                <parameter name='birthDiffRate' id="birthRate.t:$(n)" lower="0.0" value='1.0'/>
+            <plugin spec='beast.base.spec.evolution.speciation.YuleModel' id="YuleModel.t:$(n)" tree='@Tree.t:$(n)'>
+                <parameter name='birthDiffRate' spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" id="birthRate.t:$(n)" lower="0.0" value='1.0'/>
             </plugin>
 
-            <prior id='YuleBirthRatePrior.t:$(n)' x='@birthRate.t:$(n)'><distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='1000'/></prior>
+            <prior id='YuleBirthRatePrior.t:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@birthRate.t:$(n)'><distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='1000'/></prior>
 
-  		    <scale id='YuleBirthRateScaler.t:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.75" weight="3" parameter="@birthRate.t:$(n)"/>
+  		    <scale id='YuleBirthRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@birthRate.t:$(n)"/>
 ]]>
 			<plate fragment="TreeOperators" var="m" range="YuleModel"/>
 
