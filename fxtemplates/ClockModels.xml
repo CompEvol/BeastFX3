@@ -7,29 +7,33 @@
     <mergewith point='clockModelTemplates'>
 
         <!-- Strict clock -->
-        <subtemplate id='StrictClock' class='beast.base.evolution.branchratemodel.StrictClockModel'
+        <subtemplate id='StrictClock' class='beast.base.spec.evolution.branchratemodel.StrictClockModel'
                      mainid='StrictClock.c:$(n)'
                      hmc='ClockPrior/index/=Priors/ClockPrior/,
                         StrictClockRateScaler/index/=Operators/BactrianRateScaler/index/,
                         strictClockUpDownOperator/index/=Operators/BactrianUpDown/index/'>
             <![CDATA[
-                <branchRateModel spec='StrictClockModel' id='StrictClock.c:$(n)'>
-                    <clock.rate id='clockRate.c:$(n)' spec='parameter.RealParameter' value='1.0' lower="0.0" estimate='false'/>
+                <branchRateModel spec='beast.base.spec.evolution.branchratemodel.StrictClockModel' id='StrictClock.c:$(n)'>
+                    <clock.rate id='clockRate.c:$(n)' spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value='1.0' lower="0.0" estimate='false'/>
                 </branchRateModel>
 
-				<operator id='StrictClockRateScaler.c:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.1" weight="3" parameter='@clockRate.c:$(n)'/>
+		        <operator id="StrictClockRateScaler.c:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="1.5">
+    	            <parameter idref="clockRate.c:$(n)"/>
+    		        <operator idref="AVMNOperator.$(n)"/>
+		    	    <operator id='StrictClockRateScalerX.c:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.1" weight="0.1" parameter="@clockRate.c:$(n)"/>
+		        </operator>
 
-	        	<operator id="strictClockUpDownOperator.c:$(n)" spec="beast.base.evolution.operator.AdaptableOperatorSampler" weight="1.5">
+	        	<operator id="strictClockUpDownOperator.c:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="1.5">
     	            <parameter idref="clockRate.c:$(n)"/>
         	        <tree idref="Tree.t:$(n)"/>
 	        	    <operator idref="AVMNOperator.$(n)"/>
-					<operator id='strictClockUpDownOperatorX.c:$(n)' spec='kernel.BactrianUpDownOperator' scaleFactor="0.75" weight="3">
+					<operator id='strictClockUpDownOperatorX.c:$(n)' spec='beast.base.spec.inference.operator.UpDownOperator' scaleFactor="0.75" weight="3">
 						<up idref="clockRate.c:$(n)"/>
 						<down idref="Tree.t:$(n)"/>
 					</operator>
     		    </operator>
 
-		        <prior id='ClockPrior.c:$(n)' x='@clockRate.c:$(n)'>
+		        <prior id='ClockPrior.c:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@clockRate.c:$(n)'>
                   <Gamma  name="distr">
                   	<alpha spec="parameter.RealParameter" value="0.01" estimate="false"/> 
                   	<beta  spec="parameter.RealParameter" value="100.0" estimate="false"/>

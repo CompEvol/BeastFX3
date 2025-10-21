@@ -43,7 +43,7 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
 
     // vars for dealing with mean-rate delta exchange operator
     CheckBox fixMeanRatesCheckBox;
-    DeltaExchangeOperator.G operator;
+    DeltaExchangeOperator operator;
     protected SmallLabel fixMeanRatesValidateLabel;
 
 	public SiteModelInputEditor() {
@@ -74,9 +74,9 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
 					// set up relative weights
 					setUpOperator();
 			});
-    	operator = (DeltaExchangeOperator.G) doc.pluginmap.get("FixMeanMutationRatesOperator");
+    	operator = (DeltaExchangeOperator) doc.pluginmap.get("FixMeanMutationRatesOperator");
     	if (operator == null) {
-    		operator = new DeltaExchangeOperator().new G();
+    		operator = new DeltaExchangeOperator();
     		try {
     			operator.setID("FixMeanMutationRatesOperator");
 				operator.initByName("weight", 2.0, "delta", 0.75);
@@ -267,7 +267,7 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
     public static boolean customConnector(BeautiDoc doc) {
 System.err.println("SiteModelInputEditor::customConnector() called");
  		try {
- 			DeltaExchangeOperator.G operator = (DeltaExchangeOperator.G) doc.pluginmap.get("FixMeanMutationRatesOperator");
+ 			DeltaExchangeOperator operator = (DeltaExchangeOperator) doc.pluginmap.get("FixMeanMutationRatesOperator");
  	        if (operator == null) {
  	        	return false;
  	        }

@@ -51,8 +51,8 @@ import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.alignment.FilteredAlignment;
 import beast.base.evolution.alignment.Taxon;
 import beast.base.evolution.branchratemodel.BranchRateModel;
-import beast.base.evolution.likelihood.GenericTreeLikelihood;
-import beast.base.evolution.sitemodel.SiteModel;
+import beast.base.spec.evolution.likelihood.GenericTreeLikelihood;
+import beast.base.spec.evolution.sitemodel.SiteModel;
 import beast.base.evolution.sitemodel.SiteModelInterface;
 import beast.base.evolution.tree.TreeInterface;
 import beast.base.inference.CompoundDistribution;
@@ -1278,7 +1278,7 @@ public class AlignmentListInputEditor extends ListInputEditor {
 			// before deleting, unlink site model, clock model and tree
 			
 			// check whether any of the models are linked
-			BranchRateModel.Base clockModel = likelihoods[rowNr].branchRateModelInput.get();
+			beast.base.spec.evolution.branchratemodel.Base clockModel = likelihoods[rowNr].branchRateModelInput.get();
 			SiteModelInterface siteModel = likelihoods[rowNr].siteModelInput.get();
 			TreeInterface tree = likelihoods[rowNr].treeInput.get();
 			List<GenericTreeLikelihood> cModels = new ArrayList<>();

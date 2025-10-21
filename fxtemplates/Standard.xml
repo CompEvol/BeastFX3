@@ -250,7 +250,7 @@ ClusterTree/clusterType/,
 		<alignmentProvider id="Import Alignment" spec='BeautiAlignmentProvider' template='@StandardPartitionTemplate'/>
 
 
-        <partitiontemplate id='StandardPartitionTemplate' spec='BeautiSubTemplate' class='beast.base.evolution.likelihood.ThreadedTreeLikelihood' mainid='mcmc'>
+        <partitiontemplate id='StandardPartitionTemplate' spec='BeautiSubTemplate' class='beast.base.spec.evolution.likelihood.ThreadedTreeLikelihood' mainid='mcmc'>
 <![CDATA[
             <!-- site model                                                              -->
             <plugin spec='beast.base.spec.evolution.sitemodel.SiteModel' id="SiteModel.s:$(n)" gammaCategoryCount='0'>
@@ -260,16 +260,18 @@ ClusterTree/clusterType/,
                 <shape               spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" id='gammaShape.s:$(n)' value='1.0' lower="0.1" estimate='false'/>
             </plugin>
 
-            <plugin spec='ThreadedTreeLikelihood' id="treeLikelihood.$(n)">
+            <plugin spec='beast.base.spec.evolution.likelihood.ThreadedTreeLikelihood' id="treeLikelihood.$(n)">
                 <data idref="data"/>
                 <tree idref="Tree.t:$(n)"/>
                 <siteModel idref="SiteModel.s:$(n)"/>
-                <branchRateModel spec='StrictClockModel' id='StrictClock.c:$(n)'>
-                    <clock.rate id='clockRate.c:$(n)' spec='parameter.RealParameter' lower="0.0" value='1.0' estimate='false'/>
+                <branchRateModel spec='beast.base.spec.evolution.branchratemodel.StrictClockModel' id='StrictClock.c:$(n)'>
+                    <clock.rate id='clockRate.c:$(n)' spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value='1.0' lower="0.0" estimate='false'/>
                 </branchRateModel>
             </plugin>
 
-	        <prior id='ClockPrior.c:$(n)' x='@clockRate.c:$(n)'><distr spec="beast.base.inference.distribution.Uniform" upper='Infinity'/></prior>
+		    <prior id='ClockPrior.c:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@clockRate.c:$(n)'>
+	        	<distr spec="beast.base.inference.distribution.Uniform" upper='Infinity'/>
+	        </prior>
             <prior id='MutationRatePrior.s:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@mutationRate.s:$(n)'><distr spec="OneOnX"/></prior>
 
             <!-- tree and its properties -->
@@ -334,17 +336,17 @@ ClusterTree/clusterType/,
             	</transformations>
             </operator>
 
-	        <operator id="StrictClockRateScaler.c:$(n)" spec="beast.base.evolution.operator.AdaptableOperatorSampler" weight="1.5">
+	        <operator id="StrictClockRateScaler.c:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="1.5">
                 <parameter idref="clockRate.c:$(n)"/>
     	        <operator idref="AVMNOperator.$(n)"/>
-        	    <operator id='StrictClockRateScalerX.c:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.75" weight="3" parameter='@clockRate.c:$(n)'/>
+		        <operator id='StrictClockRateScalerX.c:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.1" weight="0.1" parameter="@clockRate.c:$(n)"/>
 	        </operator>
 
-        	<operator id="strictClockUpDownOperator.c:$(n)" spec="beast.base.evolution.operator.AdaptableOperatorSampler" weight="1.5">
+        	<operator id="strictClockUpDownOperator.c:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="1.5">
                 <parameter idref="clockRate.c:$(n)"/>
                 <tree idref="Tree.t:$(n)"/>
 	            <operator idref="AVMNOperator.$(n)"/>
-				<operator id='strictClockUpDownOperatorX.c:$(n)' spec='kernel.BactrianUpDownOperator' scaleFactor="0.75" weight="3">
+				<operator id='strictClockUpDownOperatorX.c:$(n)' spec='beast.base.spec.inference.operator.UpDownOperator' scaleFactor="0.75" weight="3">
 					<up idref="clockRate.c:$(n)"/>
 					<down idref="Tree.t:$(n)"/>
 				</operator>

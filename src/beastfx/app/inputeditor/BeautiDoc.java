@@ -62,8 +62,11 @@ import beast.base.evolution.alignment.FilteredAlignment;
 import beast.base.evolution.alignment.Taxon;
 import beast.base.evolution.alignment.TaxonSet;
 import beast.base.evolution.branchratemodel.BranchRateModel;
-import beast.base.evolution.branchratemodel.StrictClockModel;
-import beast.base.evolution.likelihood.GenericTreeLikelihood;
+import beast.base.spec.evolution.branchratemodel.Base;
+import beast.base.spec.evolution.branchratemodel.StrictClockModel;
+import beast.base.spec.evolution.likelihood.GenericTreeLikelihood;
+import beast.base.spec.inference.parameter.RealScalarParam;
+import beast.base.spec.inference.parameter.RealVectorParam;
 import beast.base.evolution.operator.TipDatesRandomWalker;
 import beast.base.evolution.substitutionmodel.SubstitutionModel;
 import beast.base.evolution.tree.MRCAPrior;
@@ -78,7 +81,7 @@ import beast.base.inference.distribution.Normal;
 import beast.base.inference.distribution.ParametricDistribution;
 import beast.base.inference.distribution.Prior;
 import beast.base.inference.parameter.Parameter;
-import beast.base.inference.parameter.RealParameter;
+//import beast.base.inference.parameter.RealParameter;
 import beast.base.parser.JSONProducer;
 import beast.base.parser.NexusParser;
 import beast.base.parser.PartitionContext;
@@ -1317,7 +1320,7 @@ public class BeautiDoc extends BEASTObject implements RequiredInputProvider {
             List<BeautiSubTemplate> templates = new ArrayList<>();
             templates.add(beautiConfig.hyperPriorTemplate);
             for (BEASTInterface beastObject : pluginmap.values()) {
-                if (beastObject instanceof RealParameter) {
+                if (beastObject instanceof StateNode) {
                     if (beastObject.getID() != null && beastObject.getID().startsWith("parameter.")) {
                         PartitionContext context = new PartitionContext(beastObject.getID().substring("parameter.".length()));
                         applyBeautiRules(templates, isInitial, context);
@@ -1467,14 +1470,14 @@ public class BeautiDoc extends BEASTObject implements RequiredInputProvider {
         Set<TreeInterface> treesSeen = new HashSet<>();
         if (likelihood instanceof CompoundDistribution) {
             int i = 0;
-            RealParameter firstClock = null;
+            StateNode firstClock = null;
             for (Distribution distr : ((CompoundDistribution) likelihood).pDistributions.get()) {
                 if (distr instanceof GenericTreeLikelihood) {
                     GenericTreeLikelihood treeLikelihood = (GenericTreeLikelihood) distr;                    
                     TreeInterface currentTree = treeLikelihood.treeInput.get();
                     boolean needsEstimation = needsEstimationBySPTree;
                     if (i > 0) {
-                        BranchRateModel.Base model = treeLikelihood.branchRateModelInput.get();
+                        Base model = treeLikelihood.branchRateModelInput.get();
                         needsEstimation = (model.meanRateInput.get() != firstClock && treesSeen.contains(currentTree)) || firstClock.isEstimatedInput.get();
                     } else {
                         // TODO: this might not be a valid type conversion from TreeInterface to Tree
@@ -1493,9 +1496,9 @@ public class BeautiDoc extends BEASTObject implements RequiredInputProvider {
                             }
                         }
                     }
-                    BranchRateModel.Base model = treeLikelihood.branchRateModelInput.get();
-                    if (model != null && model.meanRateInput.get() instanceof RealParameter) {
-                        RealParameter clockRate = (RealParameter) model.meanRateInput.get();
+                    Base model = treeLikelihood.branchRateModelInput.get();
+                    if (model != null && model.meanRateInput.get() instanceof StateNode) {
+                    	StateNode clockRate = (StateNode) model.meanRateInput.get();
                         clockRate.isEstimatedInput.setValue(needsEstimation, clockRate);
                         if (firstClock == null) {
                             firstClock = clockRate;
@@ -2422,7 +2425,7 @@ public class BeautiDoc extends BEASTObject implements RequiredInputProvider {
                 }
             }
             // add parameters that have more than 1 outputs into susbtitution models
-            if (beastObject instanceof Parameter<?>) {
+            if (beastObject instanceof RealScalarParam<?> || beastObject instanceof RealVectorParam<?>) {
                 for (Object output : beastObject.getOutputs()) {
                     if (posteriorPredecessors.contains(output)) {
                         if (output instanceof SubstitutionModel) {
@@ -2447,7 +2450,7 @@ public class BeautiDoc extends BEASTObject implements RequiredInputProvider {
 
         hasLinkedAtLeastOnce = false;
         for (Input<?> input : linked) {
-            if (input.getType().isAssignableFrom(RealParameter.class)) {
+            if (input.getType().isAssignableFrom(StateNode.class)) {
                 hasLinkedAtLeastOnce = true;
                 break;
             }
