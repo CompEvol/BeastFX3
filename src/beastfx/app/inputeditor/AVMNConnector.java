@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 import beast.base.core.BEASTInterface;
-import beast.base.core.Function;
-import beast.base.evolution.branchratemodel.BranchRateModel;
-import beast.base.inference.operator.kernel.Transform.LogTransform;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.inference.operator.Transform.LogTransform;
+import beast.base.spec.evolution.branchratemodel.Base;
+import beast.base.spec.inference.parameter.RealScalarParam;
+import beast.base.spec.type.RealScalar;
+import beast.base.spec.type.Tensor;
 
 
 /**
@@ -41,11 +42,10 @@ public class AVMNConnector {
 				if (t instanceof LogTransform) {
 					LogTransform logtransform = (LogTransform) t;
 					BEASTInterface c = clockPartitions.get(i);
-					if (c instanceof BranchRateModel.Base) {
-						BranchRateModel.Base clockmodel = (BranchRateModel.Base) c;
-						Function f = clockmodel.meanRateInput.get();
-						if (f instanceof RealParameter) {
-							RealParameter clockrate = (RealParameter) f;
+					if (c instanceof Base clockmodel) {
+						RealScalar<?> f = clockmodel.meanRateInput.get();
+						if (f instanceof RealScalarParam<?>) {
+							RealScalarParam<?> clockrate = (RealScalarParam<?>) f;
 							
 				    		if (clockrate.isEstimatedInput.get() && partitionsPerClockCount.get(clockID) == 1) {
 				    			// connect mean clock rate to AVMN operator
@@ -65,16 +65,16 @@ public class AVMNConnector {
     	return true;
     }
 
-	private static void disconnect(RealParameter clockrate, LogTransform logtransform) {
-		for (Function f : logtransform.functionInput.get()) {
+	private static void disconnect(RealScalarParam<?> clockrate, LogTransform logtransform) {
+		for (Tensor f : logtransform.functionInput.get()) {
 			if (f == clockrate) {
 				logtransform.functionInput.get().remove(clockrate);
 			}
 		}
 	}
 
-	private static void connect(RealParameter clockrate, LogTransform logtransform) {
-		for (Function f : logtransform.functionInput.get()) {
+	private static void connect(RealScalarParam<?> clockrate, LogTransform logtransform) {
+		for (Tensor f : logtransform.functionInput.get()) {
 			if (f == clockrate) {
 				return;
 			}

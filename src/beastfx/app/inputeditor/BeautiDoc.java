@@ -1124,7 +1124,7 @@ public class BeautiDoc extends BEASTObject implements RequiredInputProvider {
                 List<BeautiSubTemplate> availableBEASTObjects = inputEditorFactory.getAvailableTemplates(
                         treelikelihood.branchRateModelInput, treelikelihood, null, this);
                 BEASTInterface beastObject = availableBEASTObjects.get(0).createSubNet(partitionNames.get(clockModels.size()), true);
-                clockModels.add((BranchRateModel.Base) beastObject);
+                clockModels.add((Base) beastObject);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

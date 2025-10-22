@@ -60,9 +60,11 @@
 
 
         <!-- Random local clock -->
-        <subtemplate id='RandomLocalClock' class='beast.base.evolution.branchratemodel.RandomLocalClockModel'
+        <subtemplate id='RandomLocalClock' class='beast.base.spec.evolution.branchratemodel.RandomLocalClockModel'
                      mainid='RandomLocalClock.c:$(n)'
-                     suppressInputs='beast.base.evolution.branchratemodel.RandomLocalClockModel.rates'
+                     suppressInputs='beast.base.spec.evolution.branchratemodel.RandomLocalClockModel.rates,
+                     beast.base.spec.evolution.branchratemodel.RandomLocalClockModel.indicators,
+                     beast.base.spec.evolution.branchratemodel.RandomLocalClockModel.tree'
                      hmc='
 					 RandomLocalClock/clock.rate/=StrictClock/clock.rate/,
 					 RandomLocalClock/scaling/,
@@ -77,18 +79,18 @@
                      BitFlipOperator/index/=Operators/BitFlipper/index/
                      '>
             <![CDATA[
-        <input spec='RandomLocalClockModel' id="RandomLocalClock.c:$(n)" ratesAreMultipliers="false" tree='@Tree.t:$(n)'>
-            <clock.rate id='meanClockRate.c:$(n)' spec='parameter.RealParameter' value='1.0' lower="0.0" estimate='false'/>
-            <parameter spec='parameter.BooleanParameter' name='indicators' id='Indicators.c:$(n)' value="0"/>
-            <parameter name='rates' id='clockrates.c:$(n)' value="1" lower="1e-9"/>
+        <input spec='beast.base.spec.evolution.branchratemodel.RandomLocalClockModel' id="RandomLocalClock.c:$(n)" ratesAreMultipliers="false" tree='@Tree.t:$(n)'>
+            <clock.rate id='meanClockRate.c:$(n)' spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value='1.0' lower="0.0" estimate='false'/>
+            <parameter spec='beast.base.spec.inference.parameter.BoolVectorParam' name='indicators' id='Indicators.c:$(n)' value="0"/>
+            <parameter spec='beast.base.spec.inference.parameter.RealVectorParam' name='rates' id='clockrates.c:$(n)' value="1" lower="1e-9"/>
         </input>
 
-        <operator id="IndicatorsBitFlip.c:$(n)" spec="BitFlipOperator" weight="15" parameter="@Indicators.c:$(n)"/>
+        <operator id="IndicatorsBitFlip.c:$(n)" spec="beast.base.spec.inference.operator.BitFlipOperator" weight="15" parameter="@Indicators.c:$(n)"/>
 <!-- this should probably be a DeltaExchange instead of scale operator to keep mean rate to 1 -->
-        <operator id='ClockRateScaler.c:$(n)' spec='kernel.BactrianScaleOperator' scaleAll='false' scaleFactor="0.1" weight="15" parameter="@clockrates.c:$(n)"/>
+        <operator id='ClockRateScaler.c:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleVectorOperator' scaleAll='false' scaleFactor="0.1" weight="15" parameter="@clockrates.c:$(n)"/>
 
-        <operator id='randomClockScaler.c:$(n)' spec='kernel.BactrianScaleOperator' scaleAll='false' scaleFactor="0.1" weight="1" parameter="@meanClockRate.c:$(n)"/>
-		<operator id='randomClockUpDownOperator.c:$(n)' spec='kernel.BactrianUpDownOperator' scaleFactor="0.1" weight="3">
+        <operator id='randomClockScaler.c:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.1" weight="1" parameter="@meanClockRate.c:$(n)"/>
+		<operator id='randomClockUpDownOperator.c:$(n)' spec='beast.base.spec.inference.operator.UpDownOperator' scaleFactor="0.1" weight="3">
 			<up idref="meanClockRate.c:$(n)"/>
 			<down idref="Tree.t:$(n)"/>
 		</operator>
@@ -96,7 +98,7 @@
 		<distribution idref="prior">
 			<if cond='inlikelihood(RandomLocalClock.c:$(n))'>
 				<!-- prior on rates -->
-			    <prior id='RRatesPrior.c:s$(n)' name="distribution" x='@clockrates.c:$(n)'>
+			    <prior spec="beast.base.spec.inference.distribution.Prior" id='RRatesPrior.c:s$(n)' name="distribution" vector='@clockrates.c:$(n)'>
 			        <Gamma id="Gamma.0" name="distr">
 			            <parameter estimate="false" name="alpha">0.5</parameter>
 			            <parameter estimate="false" name="beta">2.0</parameter>
@@ -104,8 +106,8 @@
 				</prior>
 
 				<!-- prior on number of changes -->
-				<prior id="RRateChangesPrior.c:$(n)" name="distribution">
-					<x id="RRateChanges.c:$(n)" spec="beast.base.evolution.Sum" arg="@Indicators.c:$(n)"/>
+				<prior spec="beast.base.spec.inference.distribution.Prior" id="RRateChangesPrior.c:$(n)" name="distribution">
+					<scalar id="RRateChanges.c:$(n)" spec="beast.base.spec.evolution.Sum" arg="@Indicators.c:$(n)"/>
                     <distr spec='beast.base.inference.distribution.Poisson'>
                           <lambda spec='parameter.RealParameter' estimate='false' value='0.6931471805599453'/>
                     </distr>
@@ -119,7 +121,7 @@
 			</if>
 		</logger>
 
-      <prior id='MeanRRatePrior.c:s$(n)' x='@meanClockRate.c:$(n)'>
+      <prior id='MeanRRatePrior.c:s$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@meanClockRate.c:$(n)'>
                   <Gamma  name="distr">
                   	<alpha spec="parameter.RealParameter" value="0.01" estimate="false"/> 
                   	<beta  spec="parameter.RealParameter" value="100.0" estimate="false"/>
