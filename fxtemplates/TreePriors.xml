@@ -89,9 +89,9 @@ YuleBirthRatePrior/index/=Priors/YuleBirthRatePrior/
         </subtemplate>
 
         <!-- Calibrated Yule -->
-        <subtemplate id='CalibratedYuleModel' class='beast.base.evolution.speciation.CalibratedYuleModel'
+        <subtemplate id='CalibratedYuleModel' class='beast.base.spec.evolution.speciation.CalibratedYuleModel'
                      mainid='CalibratedYuleModel.t:$(n)'
-                     suppressInputs='beast.base.evolution.speciation.CalibratedYuleModel.logMarginal,beast.base.evolution.speciation.CalibratedYuleModel.tree,beast.base.evolution.speciation.CalibratedYuleModel.treeIntervals,beast.base.evolution.speciation.CalibratedYuleModel.calibrations'
+                     suppressInputs='beast.base.spec.evolution.speciation.CalibratedYuleModel.logMarginal,beast.base.spec.evolution.speciation.CalibratedYuleModel.tree,beast.base.spec.evolution.speciation.CalibratedYuleModel.treeIntervals,beast.base.spec.evolution.speciation.CalibratedYuleModel.calibrations'
                      hmc="
 CalibratedYuleModelUniformOperator/index/=Operators/BactrianNodeOperator/index,
 CalibratedYuleModelSubtreeSlide/index/=Operators/SubtreeSlide/,
@@ -106,13 +106,15 @@ CalibratedYuleBirthRateScaler/index/=Operators/BactrianRateScaler/,
 CalibratedYuleBirthRatePrior/index/=Priors/CalibratedYuleBirthRatePrior/
 ">
             <![CDATA[
-            <plugin spec='CalibratedYuleModel' id="CalibratedYuleModel.t:$(n)" tree='@Tree.t:$(n)'>
-                <parameter name='birthRate' id="birthRateY.t:$(n)" lower="0.0" value='1.0'/>
+            <plugin spec='beast.base.spec.evolution.speciation.CalibratedYuleModel' id="CalibratedYuleModel.t:$(n)" tree='@Tree.t:$(n)'>
+                <parameter name='birthRate' spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" id="birthRateY.t:$(n)" lower="0.0" value='1.0'/>
             </plugin>
 
-            <prior id='CalibratedYuleBirthRatePrior.t:$(n)' x='@birthRateY.t:$(n)'><distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='1000'/></prior>
+            <prior id='CalibratedYuleBirthRatePrior.t:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@birthRateY.t:$(n)'>
+            	<distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='1000'/>
+            </prior>
 
-  		    <scale id='CalibratedYuleBirthRateScaler.t:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.75" weight="3" parameter="@birthRateY.t:$(n)"/>
+  		    <scale id='CalibratedYuleBirthRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@birthRateY.t:$(n)"/>
 ]]>
 			<plate fragment="TreeOperators" var="m" range="CalibratedYuleModel"/>
 
@@ -142,7 +144,7 @@ CalibratedYuleBirthRatePrior/index/=Priors/CalibratedYuleBirthRatePrior/
         </subtemplate>
 
         <!-- Birth Death model according to Gernhard'08 -->
-        <subtemplate id='BirthDeathModel' class='beast.base.evolution.speciation.BirthDeathGernhard08Model'
+        <subtemplate id='BirthDeathModel' class='beast.base.spec.evolution.speciation.BirthDeathGernhard08Model'
                      mainid='BirthDeath.t:$(n)'
 hmc='
 BirthDeathUniformOperator/index/=Operators/BactrianNodeOperator/index,
@@ -159,16 +161,20 @@ DeathRateScaler/index/=Operators/BactrianRateScaler/,
 BirthRatePrior/index/=Priors/BirthRatePrior/,
 DeathRatePrior/index/=Priors/DeathRatePrior/'>
             <![CDATA[
-            <distribution id="BirthDeath.t:$(n)" spec="BirthDeathGernhard08Model" tree='@Tree.t:$(n)'>
-                <birthDiffRate spec='parameter.RealParameter' id="BDBirthRate.t:$(n)" value='1' lower='0' upper='10000' />
-            	<relativeDeathRate spec='parameter.RealParameter' id="BDDeathRate.t:$(n)" value='0.5' lower='0' upper='1' />
+            <distribution id="BirthDeath.t:$(n)" spec="beast.base.spec.evolution.speciation.BirthDeathGernhard08Model" tree='@Tree.t:$(n)'>
+                <birthDiffRate spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" id="BDBirthRate.t:$(n)" value='1' lower='0' upper='10000' />
+            	<relativeDeathRate spec="beast.base.spec.inference.parameter.RealScalarParam" domain="UnitInterval" id="BDDeathRate.t:$(n)" value='0.5' lower='0' upper='1' />
             </distribution>
 
-            <prior id='BirthRatePrior.t:$(n)' x='@BDBirthRate.t:$(n)'><distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='1000'/></prior>
-            <prior id='DeathRatePrior.t:$(n)' x='@BDDeathRate.t:$(n)'><distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='1'/></prior>
+            <prior id='BirthRatePrior.t:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@BDBirthRate.t:$(n)'>
+            	<distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='1000'/>
+            </prior>
+            <prior id='DeathRatePrior.t:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@BDDeathRate.t:$(n)'>
+            	<distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='1'/>
+            </prior>
 
-  		    <scale id='BirthRateScaler.t:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.75" weight="3" parameter="@BDBirthRate.t:$(n)"/>
-  		    <scale id='DeathRateScaler.t:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.75" weight="3" parameter="@BDDeathRate.t:$(n)"/>
+  		    <scale id='BirthRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@BDBirthRate.t:$(n)"/>
+  		    <scale id='DeathRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@BDDeathRate.t:$(n)"/>
 ]]>
 			<plate fragment="TreeOperators" var="m" range="BirthDeath"/>
 
@@ -227,13 +233,15 @@ PopSizeScaler/index/=Operators/BactrianRateScaler/index/'>
             <![CDATA[
             <distribution id="CoalescentConstant.t:$(n)" spec="Coalescent">
                 <treeIntervals spec='beast.base.evolution.tree.TreeIntervals' id='TreeIntervals.t:$(n)' tree='@Tree.t:$(n)'/>
-                <populationModel spec="ConstantPopulation" id='ConstantPopulation.t:$(n)'>
-                     <parameter name="popSize" id="popSize.t:$(n)" value='0.3' lower="0.0" estimate='true'/>
+                <populationModel spec="beast.base.spec.evolution.tree.coalescent.ConstantPopulation" id='ConstantPopulation.t:$(n)'>
+                     <parameter name="popSize" id="popSize.t:$(n)" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value='0.3' lower="0.0" estimate='true'/>
                  </populationModel>
             </distribution>
 
-  		    <operator id='PopSizeScaler.t:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.75" weight="3" parameter="@popSize.t:$(n)"/>
-	        <prior id='PopSizePrior.t:$(n)' x='@popSize.t:$(n)'>
+  		    <operator id='PopSizeScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' 
+  		    	scaleFactor="0.75" weight="3" parameter="@popSize.t:$(n)"/>
+  		    	
+	        <prior id='PopSizePrior.t:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@popSize.t:$(n)'>
 	        	<distr spec="OneOnX"/>
 	        </prior>
 ]]>
@@ -282,19 +290,21 @@ GrowthRateRandomWalk/index/=Operators/BactrianRandomWalk'>
             <![CDATA[
             <distribution id="CoalescentExponential.t:$(n)" spec="Coalescent">
                 <treeIntervals spec='beast.base.evolution.tree.TreeIntervals' id='TreeIntervals.t:$(n)' tree='@Tree.t:$(n)'/>
-                <populationModel spec="ExponentialGrowth" id="ExponentialGrowth.t:$(n)">
-                    <parameter name="popSize" id="ePopSize.t:$(n)" value='0.3' lower="0.0" estimate='true'/>
-                    <parameter name="growthRate" id="growthRate.t:$(n)" value='3e-4' estimate='true'/>
+                <populationModel spec="beast.base.spec.evolution.tree.coalescent.ExponentialGrowth" id="ExponentialGrowth.t:$(n)">
+                    <parameter name="popSize" id="ePopSize.t:$(n)" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value='0.3' lower="0.0" estimate='true'/>
+                    <parameter name="growthRate" id="growthRate.t:$(n)" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value='3e-4' estimate='true'/>
                 </populationModel>
             </distribution>
 
-  		    <operator id='ePopSizeScaler.t:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.75" weight="3" parameter="@ePopSize.t:$(n)"/>
-	        <operator id="GrowthRateRandomWalk.t:$(n)" spec="kernel.BactrianRandomWalkOperator" scaleFactor='0.1' weight="3" parameter="@growthRate.t:$(n)"/>
+  		    <operator id='ePopSizeScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@ePopSize.t:$(n)"/>
+	        
+	        <operator id="GrowthRateRandomWalk.t:$(n)" spec="beast.base.spec.inference.operator.RealRandomWalkOperator" scaleFactor='0.1' weight="3" scalar="@growthRate.t:$(n)"/>
 
-	        <prior id='ePopSizePrior.t:$(n)' x='@ePopSize.t:$(n)'>
+	        <prior id='ePopSizePrior.t:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@ePopSize.t:$(n)'>
 	        	<distr spec="OneOnX"/>
 	        </prior>
-	        <prior id='GrowthRatePrior.t:$(n)' x='@growthRate.t:$(n)'>
+	        
+	        <prior id='GrowthRatePrior.t:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@growthRate.t:$(n)'>
 	        	<distr spec="LaplaceDistribution">
 	        		<parameter name="mu" value='0.001' estimate="false"/>
 	        		<parameter name="scale" value='0.5' estimate="false"/>
