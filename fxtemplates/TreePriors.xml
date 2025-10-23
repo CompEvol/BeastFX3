@@ -353,10 +353,10 @@ GrowthRateRandomWalk/index/=Operators/BactrianRandomWalk'>
         <!-- Coalescent for Bayesian skyline -->
         <subtemplate id='CoalescentBayesianSkyline' class='beast.base.evolution.tree.coalescent.Coalescent'
                      mainid='BayesianSkyline.t:$(n)'
-                     suppressInputs='beast.base.inference.distribution.MarkovChainDistribution.parameter,
-                     beast.base.inference.distribution.MarkovChainDistribution.initialMean,
-                     beast.base.evolution.tree.coalescent.BayesianSkyline.tree,
-                     beast.base.evolution.tree.coalescent.BayesianSkyline.treeIntevals
+                     suppressInputs='beast.base.spec.inference.distribution.MarkovChainDistribution.parameter,
+                     beast.base.spec.inference.distribution.MarkovChainDistribution.initialMean,
+                     beast.base.spec.evolution.tree.coalescent.BayesianSkyline.tree,
+                     beast.base.spec.evolution.tree.coalescent.BayesianSkyline.treeIntevals
                      ' 
                      hmc='
 BayesianSkylineUniformOperator/index/=Operators/BactrianNodeOperator/index,
@@ -371,19 +371,19 @@ BayesianSkylineTreeRootScaler/index/=Operators/BactrianTreeScaler/,
 popSizesScaler/index/=Operators/BactrianRateScaler/,
 groupSizesDelta/index/=Operators/BactrianDeltaExchange/index/'>
             <![CDATA[
-            <distribution spec="BayesianSkyline" id='BayesianSkyline.t:$(n)'>
-                <parameter name='popSizes' id='bPopSizes.t:$(n)' dimension="5" value="380.0" lower="0.0" estimate='true'/>
-                <groupSizes spec='parameter.IntegerParameter' id='bGroupSizes.t:$(n)' dimension='5' value='1' estimate='true'/>
+            <distribution spec="beast.base.spec.evolution.tree.coalescent.BayesianSkyline" id='BayesianSkyline.t:$(n)'>
+                <parameter name='popSizes' id='bPopSizes.t:$(n)' spec="beast.base.spec.inference.parameter.RealVectorParam" domain="PositiveReal" dimension="5" value="380.0" lower="0.0" estimate='true'/>
+                <groupSizes spec="beast.base.spec.inference.parameter.IntSimplexParam" domain="PositiveInt" id='bGroupSizes.t:$(n)' dimension='5' value='1' estimate='true'/>
                 <treeIntervals spec='beast.base.evolution.tree.TreeIntervals' id='BSPTreeIntervals.t:$(n)' tree='@Tree.t:$(n)'/>
             </distribution>
 
-            <distribution id='MarkovChainedPopSizes.t:$(n)' spec="beast.base.inference.distribution.MarkovChainDistribution" 
+            <distribution id='MarkovChainedPopSizes.t:$(n)' spec="beast.base.spec.inference.distribution.MarkovChainDistribution" 
 				jeffreys="true"
 				parameter="@bPopSizes.t:$(n)"/>
 
-		    <operator id='popSizesScaler.t:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.75" weight="15" parameter="@bPopSizes.t:$(n)"/>
-		    <operator id='groupSizesDelta.t:$(n)' spec='kernel.BactrianDeltaExchangeOperator' delta="1" weight="6" integer="true"
-		              intparameter="@bGroupSizes.t:$(n)"/>
+		    <operator id='popSizesScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleVectorOperator' scaleFactor="0.75" weight="15" parameter="@bPopSizes.t:$(n)"/>
+		    <operator id='groupSizesDelta.t:$(n)' spec='beast.base.spec.inference.operator.DeltaExchangeOperator' delta="1" weight="6" integer="true"
+		              ivparameter="@bGroupSizes.t:$(n)"/>
 
 ]]>
 			<plate fragment="TreeOperators" var="m" range="BayesianSkyline"/>
@@ -443,45 +443,49 @@ EBSPLogger/logEvery/,
 EBSPLogger/mode/
 '>
             <![CDATA[
-	        <stateNode id="indicators.alltrees" spec="parameter.BooleanParameter" value="false"/>
-            <stateNode id="populationMean.alltrees" spec="parameter.RealParameter" lower="0.0" value="1"/>
-	        <stateNode id="popSizes.alltrees" spec="parameter.RealParameter" lower="0.0" value="1"/>
+	        <stateNode id="indicators.alltrees" spec="beast.base.spec.inference.parameter.BoolVectorParam" value="false"/>
+           <stateNode id="populationMean.alltrees" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" lower="0.0" value="1.0"/>
+	        <stateNode id="popSizes.alltrees" spec="beast.base.spec.inference.parameter.RealVectorParam" domain="PositiveReal" lower="0.0" value="1.0"/>
+
+           <factor id="factor" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0"/>
 
             <distribution id="ExtendedBayesianSkyline.t:$(n)" spec="Coalescent">
                  <treeIntervals id="treeIntervals.t:$(n)" spec='beast.base.evolution.tree.TreeIntervals' tree="@Tree.t:$(n)"/>
-                 <populationModel id="scaledDemo.t:$(n)" spec="beast.base.evolution.tree.coalescent.ScaledPopulationFunction" factor='1' population='@demographic.alltrees'/>
+                 <populationModel id="scaledDemo.t:$(n)" spec="beast.base.spec.evolution.tree.coalescent.ScaledPopulationFunction" factor='@factor' population='@demographic.alltrees'/>
             </distribution>
 
-            <population id="demographic.alltrees" populationIndicators="@indicators.alltrees" populationSizes="@popSizes.alltrees" spec="beast.base.evolution.tree.coalescent.CompoundPopulationFunction" type="linear" useIntervalsMiddle="false">
+            <population id="demographic.alltrees" populationIndicators="@indicators.alltrees" populationSizes="@popSizes.alltrees" spec="beast.base.spec.evolution.tree.coalescent.CompoundPopulationFunction" type="linear" useIntervalsMiddle="false">
                 <itree idref="treeIntervals.t:$(n)"/>
 			</population>
 
-            <prior id="populationMeanPrior.alltrees" x="@populationMean.alltrees">
+            <prior id="populationMeanPrior.alltrees" spec="beast.base.spec.inference.distribution.Prior" scalar="@populationMean.alltrees">
                 <Gamma name="distr">
                   	<alpha spec="parameter.RealParameter" value="0.01" estimate="false"/> 
                   	<beta  spec="parameter.RealParameter" value="100.0" estimate="false"/>
                 </Gamma>
             </prior>
-            <prior id="indicatorsPrior.alltrees">
-                <x arg="@indicators.alltrees" id="indsSun.alltrees" spec="beast.base.evolution.Sum"/>
+            <prior id="indicatorsPrior.alltrees" spec="beast.base.spec.inference.distribution.Prior">
+                <scalar arg="@indicators.alltrees" id="indsSun.alltrees" spec="beast.base.spec.evolution.Sum"/>
                 <distr spec="Poisson"  id='Poisson.EBSP'>
                     <parameter name="lambda" upper="0.0" value="0.69314718056" estimate='false'/>
                 </distr>
             </prior>
-            <prior id="popSizePrior.alltrees" x="@popSizes.alltrees">
-                <distr id="popPriorDist.EBSP" mean="@populationMean.alltrees" spec="Exponential"/>
+            <prior id="popSizePrior.alltrees" spec="beast.base.spec.inference.distribution.Prior" vector="@popSizes.alltrees">
+                <Exponential id="popPriorDist.EBSP" name="distr">
+                     <mean spec="beast.base.spec.FunctionOfTensor" arg="@populationMean.alltrees"/>
+                </Exponential>
             </prior>
 
             <logger id="EBSPLogger" fileName='EBSP.log' logEvery='5000' model="@demographic.alltrees">
                 <log idref='demographic.alltrees'/>
             </logger>
-            <log id='sumIndicators' spec='beast.base.evolution.Sum' arg='@indicators.alltrees'/>
+            <log id='sumIndicators' spec='beast.base.spec.evolution.Sum' arg='@indicators.alltrees'/>
 
 
-			<operator id="bitflip.alltrees" parameter="@indicators.alltrees" spec="BitFlipOperator" uniform="true" weight="30.0"/>
-			<operator id="indicatorSampler.alltrees" dist="@popPriorDist.EBSP" indicators="@indicators.alltrees" spec="beast.base.evolution.tree.coalescent.SampleOffValues" values="@popSizes.alltrees" weight="15.0"/>
-			<operator id="indicatorScaler.alltrees" degreesOfFreedom="1" indicator="@indicators.alltrees" parameter="@popSizes.alltrees" scaleAll="false" scaleAllIndependently="false" scaleFactor="0.5" spec="kernel.BactrianScaleOperator" weight="15.0"/>
-			<operator id="EBSPupDownOperator.alltrees" scaleFactor="0.7" spec="kernel.BactrianUpDownOperator" weight="5.0">
+			<operator id="bitflip.alltrees" parameter="@indicators.alltrees" spec="beast.base.spec.inference.operator.BitFlipOperator" uniform="true" weight="30.0"/>
+			<operator id="indicatorSampler.alltrees" dist="@popPriorDist.EBSP" indicators="@indicators.alltrees" spec="beast.base.spec.inference.operator.SampleOffValues" values="@popSizes.alltrees" weight="15.0"/>
+			<operator id="indicatorScaler.alltrees" degreesOfFreedom="1" indicator="@indicators.alltrees" parameter="@popSizes.alltrees" scaleAll="false" scaleAllIndependently="false" scaleFactor="0.5"  spec='beast.base.spec.inference.operator.scale.ScaleVectorOperator' weight="15.0"/>
+			<operator id="EBSPupDownOperator.alltrees" scaleFactor="0.7" spec='beast.base.spec.inference.operator.UpDownOperator' weight="5.0">
 				<up idref="popSizes.alltrees"/>
 				<up idref="populationMean.alltrees"/>
 			</operator>
