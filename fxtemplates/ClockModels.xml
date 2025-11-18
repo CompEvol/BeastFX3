@@ -106,12 +106,10 @@
 				</prior>
 
 				<!-- prior on number of changes -->
-				<prior spec="beast.base.spec.inference.distribution.Prior" id="RRateChangesPrior.c:$(n)" name="distribution">
-					<scalar id="RRateChanges.c:$(n)" spec="beast.base.spec.evolution.Sum" arg="@Indicators.c:$(n)"/>
-                    <distr spec='beast.base.inference.distribution.Poisson'>
-                          <lambda spec='parameter.RealParameter' estimate='false' value='0.6931471805599453'/>
-                    </distr>
-				</prior>
+				<distribution id='RRateChangesPrior.c:$(n)' spec='beast.base.spec.inference.distribution.Poisson' >
+					<param id="RRateChanges.c:$(n)" spec="beast.base.spec.evolution.Sum" arg="@Indicators.c:$(n)"/>
+                	<lambda spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="0.6931471805599453" estimate="false"/>
+    		    </distribution>
 			</if>
 		</distribution>
 

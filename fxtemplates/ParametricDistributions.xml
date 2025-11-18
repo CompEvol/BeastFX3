@@ -29,8 +29,8 @@
 			Normal/offset/=ParametricDistributions/Normal/offset/'>
             <![CDATA[
     <distr offset="0.0" spec="beast.base.spec.inference.distribution.Normal">
-        <mean spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="1.0" estimate="false"/>
-        <sigma spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="0.5" estimate="false"/>
+        <mean spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.0" estimate="false"/>
+        <sigma spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>
     </distr>
 ]]>
         </subtemplate>
@@ -54,7 +54,7 @@
             <![CDATA[
         <distribution spec='beast.base.spec.inference.distribution.LogNormal'>
                 <M spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="1.0" estimate="false"/>
-                <S spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="0.5" estimate="false"/>
+                <S spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.25" estimate="false"/>
         </distribution>
 ]]>
         </subtemplate>

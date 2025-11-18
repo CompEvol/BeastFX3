@@ -104,7 +104,7 @@ MutationRatePrior/index/=Priors/MutationRatePrior/
 
         <!-- HKY substitution model -->
         <subtemplate id='HKY' class='beast.base.spec.evolution.substitutionmodel.HKY' mainid='hky.s:$(n)'
-            hmc='hky/frequencies/,hky/kappa/,KappaPrior/index/=Priors/KappaPrior/,
+            hmc='HKY/frequencies/,HKY/kappa/,KappaPrior/index/=Priors/KappaPrior/,
             KappaScaler/index/=Operators/BactrianRateScaler/index/'>
             <![CDATA[
         <plugin spec='beast.base.spec.evolution.substitutionmodel.HKY' id='hky.s:$(n)'>
@@ -128,9 +128,8 @@ MutationRatePrior/index/=Priors/MutationRatePrior/
 
 
         <distribution id='KappaPrior.s:$(n)' spec='beast.base.spec.inference.distribution.LogNormal' param='@kappa.s:$(n)' >
-                <!-- M="1" S="0.5" />-->
                 <M spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="1.0" estimate="false"/>
-                <S spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="0.5" estimate="false"/>
+                <S spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.25" estimate="false"/>
         </distribution>
 
         <prior id='FrequenciesPrior.s:$(n)' vector='@freqParameter.s:$(n)' spec="beast.base.spec.inference.distribution.Prior">

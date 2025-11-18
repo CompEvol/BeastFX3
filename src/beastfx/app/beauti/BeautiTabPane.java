@@ -140,7 +140,7 @@ public class BeautiTabPane extends beastfx.app.inputeditor.BeautiTabPane impleme
     }
 
     void setTitle() {
-        ((Stage)getScene().getWindow()).setTitle("BEAUti 2: " + this.doc.getTemplateName() + " "
+        ((Stage)getScene().getWindow()).setTitle("BEAUti 3: " + this.doc.getTemplateName() + " "
                 + doc.getFileName());
     }
 
@@ -1333,7 +1333,7 @@ public class BeautiTabPane extends beastfx.app.inputeditor.BeautiTabPane impleme
             primaryStage.setTitle("BEAUti");
             beauti.frame = primaryStage;
 
-            frame.setTitle("BEAUti 2: " + doc.getTemplateName()
+            frame.setTitle("BEAUti 3: " + doc.getTemplateName()
                     + " " + doc.getFileName());
             beauti.frame = frame;
         	URL url = BEASTClassLoader.getSystemClassLoader().getResource("beast/pkgmgmt/icons/beauti.png");

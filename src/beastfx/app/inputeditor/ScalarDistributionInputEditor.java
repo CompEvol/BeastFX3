@@ -7,12 +7,14 @@ package beastfx.app.inputeditor;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.math.MathException;
 
 import beast.base.core.BEASTInterface;
 import beast.base.core.Input;
+import beast.base.inference.Distribution;
 import beast.base.parser.PartitionContext;
 import beast.base.spec.Bounded;
 import beast.base.spec.inference.distribution.ScalarDistribution;
@@ -20,11 +22,14 @@ import beast.base.spec.inference.distribution.TensorDistribution;
 import beast.base.spec.inference.parameter.BoolScalarParam;
 import beast.base.spec.inference.parameter.IntScalarParam;
 import beast.base.spec.inference.parameter.RealScalarParam;
+import beast.base.spec.type.IntScalar;
+import beast.base.spec.type.RealScalar;
 import beastfx.app.util.FXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.chart.XYChart.Data;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -54,10 +59,31 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
         return ScalarDistribution.class;
     }
 
+    
+    static List<BeautiSubTemplate> scalarTemplates;
+    static List<ScalarDistribution<?,?>> templateInstances;
+    
     @Override
     public void init(Input<?> input, BEASTInterface beastObject, int itemNr, ExpandOption isExpandOption, boolean addButtons) {
         // useDefaultBehavior = !((beastObject instanceof beast.base.inference.distribution.Prior) || beastObject instanceof MRCAPrior || beastObject instanceof TreeDistribution);
         
+    	if (scalarTemplates == null) {
+    		Input<ScalarDistribution<?,?>> _input = new Input<>("param", "dummy input");
+        	_input.setType(ScalarDistribution.class);
+        	scalarTemplates = doc.getInputEditorFactory().getAvailableTemplates(_input, beastObject, null, doc);
+
+        	templateInstances = new ArrayList<>();
+            List<?> list = (List<?>) input.get();
+            PartitionContext context = doc.getContextFor((BEASTInterface) list.get(itemNr));
+            ScalarDistribution<?,?> prior1 = (ScalarDistribution <?,?>) list.get(itemNr);
+        	for (BeautiSubTemplate template : scalarTemplates) {
+            	ScalarDistribution<?,?> newDist = (ScalarDistribution<?,?>) template.createSubNet(context, prior1, _input, true);
+            	templateInstances.add(newDist);
+        	}
+    	}
+
+    	
+    	
         useDefaultBehavior = !(beastObject instanceof ScalarDistribution) || 
         		((ScalarDistribution<?,?>)beastObject).getApacheDistribution() == null;
 
@@ -71,15 +97,81 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
         	pane = new HBox();
         }
         pane.getChildren().add(createComboBox());
-        Pane pane1 = pane;
+        
+        
+        
+        
+        ScalarDistribution<?,?> prior = (ScalarDistribution<?,?>) beastObject;
+        if (prior.paramInput.get() instanceof RealScalar p) {
+            // add range button for real parameters
+            Button rangeButton = new Button(paramToString(p));
+            rangeButton.setOnAction(e -> {
+                Button rangeButton1 = (Button) e.getSource();
+
+                List<?> list = (List<?>) m_input.get();
+                ScalarDistribution<?,?> prior1 = (ScalarDistribution<?,?>) list.get(itemNr);
+                BEASTInterface p1 = (BEASTInterface) prior1.paramInput.get();
+                BEASTObjectDialog dlg = new BEASTObjectDialog(p1, RealScalar.class, doc);
+                if (dlg.showDialog()) {
+                    dlg.accept(p1, doc);
+                    ((BEASTInterface)p1).initAndValidate();
+                    rangeButton1.setText(paramToString((RealScalar<?>)p1));
+                    refreshPanel();
+                }
+            });
+            rangeButton.setPrefWidth(InputEditor.Base.LABEL_SIZE.getWidth());
+            rangeButton.setTooltip(new Tooltip("Initial value and range of " + ((BEASTInterface)p).getID()));
+            
+            pane.getChildren().add(rangeButton);
+        } else if (prior.paramInput.get() instanceof IntScalar p) {
+            // add range button for real parameters
+            Button rangeButton = new Button(paramToString(p));
+            rangeButton.setOnAction(e -> {
+                Button rangeButton1 = (Button) e.getSource();
+
+                List<?> list = (List<?>) m_input.get();
+                ScalarDistribution<?,?> prior1 = (ScalarDistribution<?,?>) list.get(itemNr);
+                BEASTInterface p1 = (BEASTInterface) prior1.paramInput.get();
+                BEASTObjectDialog dlg = new BEASTObjectDialog(p1, IntScalar.class, doc);
+                if (dlg.showDialog()) {
+                    dlg.accept(p1, doc);
+                    p1.initAndValidate();
+                    rangeButton1.setText(paramToString((IntScalar<?>)p1));
+                    refreshPanel();
+                }
+            });
+
+            pane.getChildren().add(rangeButton);
+        }
+        
+        
+        
+        
+        
+//        Pane pane1 = pane;
         registerAsListener(pane);        
-        pane = FXUtils.newHBox();
-        pane.getChildren().add(pane1);
-        // pane.getChildren().add(createGraph());
-        getChildren().add(pane);
+//        pane = FXUtils.newHBox();
+//        pane.getChildren().add(pane1);
+//        getChildren().add(pane);
 
     } // init
 
+
+	String paramToString(RealScalar<?> p) {
+        Double lower = p.getLower();
+        Double upper = p.getUpper();
+        return "initial = " + p.get() +
+                " [" + (lower == null ? "-\u221E" : lower + "") +
+                "," + (upper == null ? "\u221E" : upper + "") + "]";
+    }
+
+    String paramToString(IntScalar<?> p) {
+        Integer lower = p.getLower();
+        Integer upper = p.getUpper();
+        return "initial = " + p.get() +
+                " [" + (lower == null ? "-\u221E" : lower + "") +
+                "," + (upper == null ? "\u221E" : upper + "") + "]";
+    }
 
     private void registerAsListener(Node node) {
 		if (node instanceof InputEditor) {
@@ -381,17 +473,16 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
         TensorDistribution<?,?> prior = (TensorDistribution<?,?>) m_beastObject;
         String text = ((BEASTInterface)prior.paramInput.get()).getID();
 
-        
-        Input<ScalarDistribution<?,?>> input = null;
-        if (prior instanceof ScalarDistribution sd) {
-        	input = new Input<>("param", "dummy input");
-        	input.setType(ScalarDistribution.class);
-        } else {
-        	return null;
+        int k = 0;
+        ScalarDistribution<?,?> distr = (ScalarDistribution<?,?>) m_beastObject;
+        Object param = distr.paramInput.get();
+        for (BeautiSubTemplate template : scalarTemplates) {
+        	if (isCompatible(param, templateInstances.get(k++))) {
+        		comboBox.getItems().add(template);
+        	}
         }
-        List<BeautiSubTemplate> availableBEASTObjects = doc.getInputEditorFactory().getAvailableTemplates(input, prior, null, doc);
-
-        comboBox.getItems().addAll(availableBEASTObjects);
+        
+        
         comboBox.setId(text+".distr");
         comboBox.setButtonCell(new ListCell<BeautiSubTemplate>() {
         	@Override
@@ -413,7 +504,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
 
         id = prior.getClass().getName();
         		// id.substring(0, id.indexOf('.'));
-        for (BeautiSubTemplate template : availableBEASTObjects) {
+        for (BeautiSubTemplate template : scalarTemplates) {
             if (template.classInput.get() != null && template._class.getName().equals(id)) {
                 comboBox.setValue(template);
             }
@@ -422,16 +513,16 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
             @SuppressWarnings("unchecked")
 			ComboBox<BeautiSubTemplate> comboBox1 = (ComboBox<BeautiSubTemplate>) e.getSource();
 
-            List list = (List) m_input.get();
+            List<Distribution> list = (List<Distribution>) m_input.get();
 
             BeautiSubTemplate template = (BeautiSubTemplate) comboBox1.getValue();
             PartitionContext context = doc.getContextFor((BEASTInterface) list.get(itemNr));
-            ScalarDistribution prior1 = (ScalarDistribution) list.get(itemNr);
+            ScalarDistribution<?,?> prior1 = (ScalarDistribution<?,?>) list.get(itemNr);
             try {
-            	Object o = ((ScalarDistribution)m_beastObject).paramInput.get();
+            	Object o = ((ScalarDistribution<?,?>) m_beastObject).paramInput.get();
             	Input<ScalarDistribution<?,?>> input_ = new Input<>("param", "dummy input");
             	input_.setType(ScalarDistribution.class);
-            	ScalarDistribution newDist = (ScalarDistribution) template.createSubNet(context, prior1, input_, true);
+            	ScalarDistribution<?,?> newDist = (ScalarDistribution<?,?>) template.createSubNet(context, prior1, input_, true);
             	newDist.paramInput.setValue(o, newDist);
             	list.set(itemNr, newDist);
             	newDist.setID(m_beastObject.getID());
@@ -463,31 +554,53 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
 
 	}
 	
-    private String getParameters() {
+    private boolean isCompatible(Object param, ScalarDistribution<?,?> scalarDistribution) {
+    	if (scalarDistribution == null) {
+    		// the "no prior" template should now be rejected
+    		return false;
+    	}
+    	
+    	if (param instanceof RealScalar) {
+    		// TOOD: any more range checks here?
+    		return !scalarDistribution.isIntegerDistribution();
+    	}
+    	
+    	if (param instanceof IntScalar) {
+    		// TOOD: any more range checks here?
+    		return scalarDistribution.isIntegerDistribution();
+    	}
+    	
+    	// don't know how to handle -- err on the side of caution and accept anything
+		return true;
+	}
+
+    
+	private String getParameters() {
     	StringBuilder b = null;
     	TensorDistribution<?,?> distr = (TensorDistribution<?,?>) m_beastObject;
     	for (Input<?> input: distr.listInputs()) {
+    		if (!input.getName().equals("param")) {
     		Object o = input.get();
-    		if (o != null && (o instanceof RealScalarParam<?> ||o instanceof IntScalarParam || o instanceof BoolScalarParam)) {
-    			BEASTInterface p = (BEASTInterface) o;
-    			if (b == null) {
-    				b = new StringBuilder();
-    				b.append(p.getInput("value").get().toString().trim());
-    			} else {
-    				b.append(',');
-    				b.append(p.getInput("value").get().toString().trim());
-    			}
-    		} else if (o != null && o instanceof Double && !input.getName().equals("offset")) {
-    			Double p = (Double) o;
-    			if (b == null) {
-    				b = new StringBuilder();
-    				b.append(p);
-    			} else {
-    				b.append(',');
-    				b.append(p);
-    			}
+	    		if (o != null && (o instanceof RealScalarParam<?> ||o instanceof IntScalarParam || o instanceof BoolScalarParam)) {
+	    			BEASTInterface p = (BEASTInterface) o;
+	    			if (b == null) {
+	    				b = new StringBuilder();
+	    				b.append(p.getInput("value").get().toString().trim());
+	    			} else {
+	    				b.append(',');
+	    				b.append(p.getInput("value").get().toString().trim());
+	    			}
+	    		} else if (o != null && o instanceof Double && !input.getName().equals("offset")) {
+	    			Double p = (Double) o;
+	    			if (b == null) {
+	    				b = new StringBuilder();
+	    				b.append(p);
+	    			} else {
+	    				b.append(',');
+	    				b.append(p);
+	    			}
+	    		}
     		}
-
     	}
 		if (b == null) {
 			return "";
