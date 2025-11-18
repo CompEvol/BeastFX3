@@ -126,12 +126,13 @@ MutationRatePrior/index/=Priors/MutationRatePrior/
 	        <operator id='FrequenciesExchangerX.s:$(n)' spec='beast.base.spec.inference.operator.deltaexchange.RealDeltaExchangeOperator' delta="0.01" weight="0.1" parameter="@freqParameter.s:$(n)"/>
         </operator>
 
-        <prior id='KappaPrior.s:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@kappa.s:$(n)'>
-            <distr spec="LogNormalDistributionModel" meanInRealSpace='false'>
-                <parameter name='M' value="1.0" estimate='false'/>
-                <parameter name='S' value="1.25" estimate='false'/>
-            </distr>
-		</prior>
+
+        <distribution id='KappaPrior.s:$(n)' spec='beast.base.spec.inference.distribution.LogNormal' param='@kappa.s:$(n)' >
+                <!-- M="1" S="0.5" />-->
+                <M spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="1.0" estimate="false"/>
+                <S spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="0.5" estimate="false"/>
+        </distribution>
+
         <prior id='FrequenciesPrior.s:$(n)' vector='@freqParameter.s:$(n)' spec="beast.base.spec.inference.distribution.Prior">
 			<distr spec="beast.base.inference.distribution.Dirichlet">
                 <parameter spec="parameter.RealParameter" dimension="4" estimate="false" name="alpha">4.0 4.0 4.0 4.0</parameter>

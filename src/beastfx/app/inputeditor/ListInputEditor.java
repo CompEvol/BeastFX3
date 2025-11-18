@@ -333,6 +333,9 @@ System.err.println("BEASTObjectPanel.countInputs(beastObject, doc) = 0");
             if (editor instanceof MRCAPriorInputEditor) {
             	((MRCAPriorInputEditor)editor).setExpandBox(expandBox);
             }
+            if (editor instanceof ScalarDistributionInputEditor) {
+            	((ScalarDistributionInputEditor)editor).setExpandBox(expandBox);
+            }
         } else {
         	editButtonIsVisible = false;
         }
