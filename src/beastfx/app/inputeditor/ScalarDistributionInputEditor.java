@@ -7,6 +7,8 @@ package beastfx.app.inputeditor;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,9 +16,17 @@ import org.apache.commons.math.MathException;
 
 import beast.base.core.BEASTInterface;
 import beast.base.core.Input;
+import beast.base.core.Log;
 import beast.base.inference.Distribution;
 import beast.base.parser.PartitionContext;
 import beast.base.spec.Bounded;
+import beast.base.spec.domain.Domain;
+import beast.base.spec.domain.Int;
+import beast.base.spec.domain.NonNegativeInt;
+import beast.base.spec.domain.NonNegativeReal;
+import beast.base.spec.domain.PositiveInt;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.domain.Real;
 import beast.base.spec.inference.distribution.ScalarDistribution;
 import beast.base.spec.inference.distribution.TensorDistribution;
 import beast.base.spec.inference.parameter.BoolScalarParam;
@@ -24,6 +34,8 @@ import beast.base.spec.inference.parameter.IntScalarParam;
 import beast.base.spec.inference.parameter.RealScalarParam;
 import beast.base.spec.type.IntScalar;
 import beast.base.spec.type.RealScalar;
+import beast.base.spec.type.Scalar;
+import beast.base.spec.type.Tensor;
 import beastfx.app.util.FXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -62,6 +74,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
     
     static List<BeautiSubTemplate> scalarTemplates;
     static List<ScalarDistribution<?,?>> templateInstances;
+    static List<Class<?>> templateDomains;
     
     @Override
     public void init(Input<?> input, BEASTInterface beastObject, int itemNr, ExpandOption isExpandOption, boolean addButtons) {
@@ -73,15 +86,16 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
         	scalarTemplates = doc.getInputEditorFactory().getAvailableTemplates(_input, beastObject, null, doc);
 
         	templateInstances = new ArrayList<>();
+        	templateDomains = new ArrayList<>();
             List<?> list = (List<?>) input.get();
             PartitionContext context = doc.getContextFor((BEASTInterface) list.get(itemNr));
             ScalarDistribution<?,?> prior1 = (ScalarDistribution <?,?>) list.get(itemNr);
         	for (BeautiSubTemplate template : scalarTemplates) {
             	ScalarDistribution<?,?> newDist = (ScalarDistribution<?,?>) template.createSubNet(context, prior1, _input, true);
             	templateInstances.add(newDist);
+            	templateDomains.add(getDomain(newDist));
         	}
     	}
-
     	
     	
         useDefaultBehavior = !(beastObject instanceof ScalarDistribution) || 
@@ -156,6 +170,52 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
 
     } // init
 
+
+	private Class<?> getDomain(ScalarDistribution<?, ?> value) {
+		if (value == null) {
+			return null;
+		}
+		
+        Type superclass = value.getClass().getGenericSuperclass();
+        if (superclass instanceof ParameterizedType pt) {
+            Type [] types = pt.getActualTypeArguments();
+            while (types[0] instanceof ParameterizedType pt2) {
+            	types = pt2.getActualTypeArguments();
+            }
+        	Class<?> type = (Class<?>) types[0];
+        	return type;
+        }
+        
+//        if (superclass instanceof ParameterizedType pt) {
+//            Type [] types = pt.getActualTypeArguments();
+//            if (types[0] instanceof ParameterizedType pt2) {
+//                Type [] types2 = pt2.getActualTypeArguments();
+//            	Class<?> type = (Class<?>) types2[0];
+//            	return type;
+//            }
+//        }
+        
+        Log.warning("Cannot determine Domain of " + value.getClass().getName());
+        
+		return null;
+	}
+	
+	
+    private Class<?> getParameterDomain(Object param) {
+    	if (param instanceof RealScalarParam rsp) {
+    		return rsp.domainTypeInput.get().getClass();
+    	}
+    	if (param instanceof IntScalarParam isp) {
+    		return isp.domainTypeInput.get().getClass();
+    	}
+    	if (param instanceof RealScalar) {
+    		return RealScalar.class;
+    	}
+    	if (param instanceof IntScalar) {
+    		return IntScalar.class;
+    	}
+        return Scalar.class;
+	}
 
 	String paramToString(RealScalar<?> p) {
         Double lower = p.getLower();
@@ -476,8 +536,9 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
         int k = 0;
         ScalarDistribution<?,?> distr = (ScalarDistribution<?,?>) m_beastObject;
         Object param = distr.paramInput.get();
+        Class<?> domain = getParameterDomain(param);
         for (BeautiSubTemplate template : scalarTemplates) {
-        	if (isCompatible(param, templateInstances.get(k++))) {
+        	if (isCompatible(domain, templateDomains.get(k++))) {
         		comboBox.getItems().add(template);
         	}
         }
@@ -554,20 +615,53 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
 
 	}
 	
-    private boolean isCompatible(Object param, ScalarDistribution<?,?> scalarDistribution) {
-    	if (scalarDistribution == null) {
+    
+	private boolean isCompatible(Class<?> paramDomain, Class<?> templateDomain) {
+    	if (templateDomain == null) {
     		// the "no prior" template should now be rejected
     		return false;
     	}
     	
-    	if (param instanceof RealScalar) {
-    		// TOOD: any more range checks here?
-    		return !scalarDistribution.isIntegerDistribution();
+		if (Real.class.isAssignableFrom(paramDomain)) {
+    		// check type first
+    		if (!(Real.class.isAssignableFrom(templateDomain))) {
+    			return false;
+    		}
+    		// more range checks here
+    		if  (paramDomain == Real.class) {
+    			return true;
+    		}
+    		if (templateDomain == paramDomain) {
+    			return true;
+    		}
+    		if (templateDomain == NonNegativeReal.class && paramDomain == PositiveReal.class) {
+    			return true;
+    		}
+    		if (templateDomain == PositiveReal.class && paramDomain == NonNegativeReal.class) {
+    			return true;
+    		}
+    		return false;
     	}
     	
-    	if (param instanceof IntScalar) {
-    		// TOOD: any more range checks here?
-    		return scalarDistribution.isIntegerDistribution();
+		if (Int.class.isAssignableFrom(paramDomain)) {
+    		// check type first
+    		if (!(Int.class.isAssignableFrom(templateDomain))) {
+    			return false;
+    		}
+    		// more range checks here
+    		if  (paramDomain == Int.class) {
+    			return true;
+    		}
+    		if (templateDomain == paramDomain) {
+    			return true;
+    		}
+    		if (templateDomain == NonNegativeInt.class && paramDomain == PositiveInt.class) {
+    			return true;
+    		}
+    		if (templateDomain == PositiveInt.class && paramDomain == NonNegativeInt.class) {
+    			return true;
+    		}
+    		return false;
     	}
     	
     	// don't know how to handle -- err on the side of caution and accept anything
