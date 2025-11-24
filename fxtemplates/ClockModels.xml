@@ -33,12 +33,11 @@
 					</operator>
     		    </operator>
 
-		        <prior id='ClockPrior.c:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@clockRate.c:$(n)'>
-                  <Gamma  name="distr">
-                  	<alpha spec="parameter.RealParameter" value="0.01" estimate="false"/> 
-                  	<beta  spec="parameter.RealParameter" value="100.0" estimate="false"/>
-                  </Gamma>
-              </prior>
+           <distribution id='ClockPrior.c:$(n)' spec='beast.base.spec.inference.distribution.Gamma' param='@clockRate.c:$(n)' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.01" estimate="false"/>
+                <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="100.0" estimate="false"/>
+           </distribution>
+
 ]]>
             <connect srcID='clockRate.c:$(n)' targetID='state' inputName='stateNode'
                      if='inlikelihood(clockRate.c:$(n)) and clockRate.c:$(n)/estimate=true'/>
@@ -98,16 +97,16 @@
 		<distribution idref="prior">
 			<if cond='inlikelihood(RandomLocalClock.c:$(n))'>
 				<!-- prior on rates -->
-			    <prior spec="beast.base.spec.inference.distribution.Prior" id='RRatesPrior.c:s$(n)' name="distribution" vector='@clockrates.c:$(n)'>
-			        <Gamma id="Gamma.0" name="distr">
-			            <parameter estimate="false" name="alpha">0.5</parameter>
-			            <parameter estimate="false" name="beta">2.0</parameter>
-			        </Gamma>
-				</prior>
+            <distribution id='RRatesPrior.c:s$(n)' spec='beast.base.spec.inference.distribution.IID' param='@clockrates.c:$(n)' >
+               <distr spec='beast.base.spec.inference.distribution.Gamma'>
+                  <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="0.5" estimate="false"/>
+                  <beta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="2.0" estimate="false"/>
+               </distr>
+            </distribution>
 
 				<!-- prior on number of changes -->
 				<distribution id='RRateChangesPrior.c:$(n)' spec='beast.base.spec.inference.distribution.Poisson' >
-					<param id="RRateChanges.c:$(n)" spec="beast.base.spec.evolution.Sum" arg="@Indicators.c:$(n)"/>
+					<param id="RRateChanges.c:$(n)" spec="beast.base.spec.evolution.IntSum" arg="@Indicators.c:$(n)"/>
                 	<lambda spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="0.6931471805599453" estimate="false"/>
     		    </distribution>
 			</if>
@@ -119,12 +118,10 @@
 			</if>
 		</logger>
 
-      <prior id='MeanRRatePrior.c:s$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@meanClockRate.c:$(n)'>
-                  <Gamma  name="distr">
-                  	<alpha spec="parameter.RealParameter" value="0.01" estimate="false"/> 
-                  	<beta  spec="parameter.RealParameter" value="100.0" estimate="false"/>
-                  </Gamma>
-      </prior>
+      <distribution id='MeanRRatePrior.c:$(n)' spec='beast.base.spec.inference.distribution.Gamma' param='@meanClockRate.c:$(n)' >
+         <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.01" estimate="false"/>
+         <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="100.0" estimate="false"/>
+      </distribution>
 ]]>
             <connect srcID='Indicators.c:$(n)' targetID='state' inputName='stateNode'
                      if='inlikelihood(Indicators.c:$(n))'/>

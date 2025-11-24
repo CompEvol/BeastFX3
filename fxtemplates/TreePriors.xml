@@ -15,9 +15,7 @@
 			replace tree scale operator with more efficient BICESPS operators.
 			<operator id='$(m)TreeScaler.t:$(n)' spec='BactrianScaleOperator' scaleFactor="0.1" weight="3" tree="@Tree.t:$(n)"/>
 -->                        
-		    <operator id="$(m)BICEPSEpochTop.t:$(n)" spec="beast.base.evolution.operator.EpochFlexOperator" tree="@Tree.t:$(n)" weight="2.0" scaleFactor="0.1"/>
-            <operator id="$(m)BICEPSEpochAll.t:$(n)" spec="beast.base.evolution.operator.EpochFlexOperator" tree="@Tree.t:$(n)" weight="2.0" scaleFactor="0.1" fromOldestTipOnly="false"/>      
-            <operator id="$(m)BICEPSTreeFlex.t:$(n)" spec="beast.base.evolution.operator.TreeStretchOperator" scaleFactor="0.01" tree="@Tree.t:$(n)" weight="2.0"/>
+		      <operator id="$(m)TreeScaler.t:$(n)" spec="beast.base.spec.inference.operator.UpDownOperator" up="@Tree.t:$(n)" weight="4.0" scaleFactor="0.1"/>
             <operator id='$(m)TreeRootScaler.t:$(n)' spec='beast.base.evolution.operator.kernel.BactrianScaleOperator' scaleFactor="0.1" weight="3" tree="@Tree.t:$(n)" rootOnly='true'/>
             <operator id='$(m)UniformOperator.t:$(n)' spec='beast.base.evolution.operator.kernel.BactrianNodeOperator' weight="30" tree="@Tree.t:$(n)"/>
             <operator id='$(m)SubtreeSlide.t:$(n)' spec='beast.base.evolution.operator.kernel.BactrianSubtreeSlide' weight="15" size="1.0" tree="@Tree.t:$(n)"/>
@@ -25,9 +23,7 @@
             <operator id='$(m)Wide.t:$(n)' spec='Exchange' isNarrow='false' weight="3" tree="@Tree.t:$(n)"/>
             <operator id='$(m)WilsonBalding.t:$(n)' spec='WilsonBalding' weight="3" tree="@Tree.t:$(n)"/>
             ]]>
-            <connect srcID='$(m)BICEPSEpochTop.t:$(n)'            targetID='mcmc' inputName='operator' if='inposterior($(m).t:$(n)) and Tree.t:$(n)/estimate=true'>Epoch operator that only scale internal nodes above least recent node for tree t:$(n)</connect>
-            <connect srcID='$(m)BICEPSEpochAll.t:$(n)'            targetID='mcmc' inputName='operator' if='inposterior($(m).t:$(n)) and Tree.t:$(n)/estimate=true'>Epoch operator that scales all internal nodes for tree t:$(n)</connect>
-            <connect srcID='$(m)BICEPSTreeFlex.t:$(n)'            targetID='mcmc' inputName='operator' if='inposterior($(m).t:$(n)) and Tree.t:$(n)/estimate=true'>Flex operators for all internal nodes for tree t:$(n)</connect>
+            <connect srcID='$(m)TreeScaler.t:$(n)'                targetID='mcmc' inputName='operator' if='inposterior($(m).t:$(n)) and Tree.t:$(n)/estimate=true'>Scale internal nodes for tree t:$(n)</connect>
             <connect srcID='$(m)TreeRootScaler.t:$(n)'            targetID='mcmc' inputName='operator' if='inposterior($(m).t:$(n)) and Tree.t:$(n)/estimate=true'>Scales root node for tree t:$(n)</connect>
             <connect srcID='$(m)UniformOperator.t:$(n)'           targetID='mcmc' inputName='operator' if='inposterior($(m).t:$(n)) and Tree.t:$(n)/estimate=true'>Draws new internal node heights uniformally for tree t:$(n)</connect>
             <connect srcID='$(m)SubtreeSlide.t:$(n)'              targetID='mcmc' inputName='operator' if='inposterior($(m).t:$(n)) and Tree.t:$(n)/estimate=true'>Performs subtree slide rearrangement of tree t:$(n)</connect>
@@ -58,9 +54,12 @@ YuleBirthRatePrior/index/=Priors/YuleBirthRatePrior/
                 <parameter name='birthDiffRate' spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" id="birthRate.t:$(n)" lower="0.0" value='1.0'/>
             </plugin>
 
-            <prior id='YuleBirthRatePrior.t:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@birthRate.t:$(n)'><distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='1000'/></prior>
+            <distribution id='YuleBirthRatePrior.t:$(n)' spec='beast.base.spec.inference.distribution.Gamma' param='@birthRate.t:$(n)' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.01" estimate="false"/>
+                <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="100.0" estimate="false"/>
+            </distribution>
 
-  		    <scale id='YuleBirthRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@birthRate.t:$(n)"/>
+  		      <scale id='YuleBirthRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@birthRate.t:$(n)"/>
 ]]>
 			<plate fragment="TreeOperators" var="m" range="YuleModel"/>
 
@@ -110,9 +109,10 @@ CalibratedYuleBirthRatePrior/index/=Priors/CalibratedYuleBirthRatePrior/
                 <parameter name='birthRate' spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" id="birthRateY.t:$(n)" lower="0.0" value='1.0'/>
             </plugin>
 
-            <prior id='CalibratedYuleBirthRatePrior.t:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@birthRateY.t:$(n)'>
-            	<distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='1000'/>
-            </prior>
+            <distribution id='CalibratedYuleBirthRatePrior.t:$(n)' spec='beast.base.spec.inference.distribution.Gamma' param='@birthRateY.t:$(n)' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.01" estimate="false"/>
+                <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="100.0" estimate="false"/>
+            </distribution>
 
   		    <scale id='CalibratedYuleBirthRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@birthRateY.t:$(n)"/>
 ]]>
@@ -166,12 +166,14 @@ DeathRatePrior/index/=Priors/DeathRatePrior/'>
             	<relativeDeathRate spec="beast.base.spec.inference.parameter.RealScalarParam" domain="UnitInterval" id="BDDeathRate.t:$(n)" value='0.5' lower='0' upper='1' />
             </distribution>
 
-            <prior id='BirthRatePrior.t:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@BDBirthRate.t:$(n)'>
-            	<distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='1000'/>
-            </prior>
-            <prior id='DeathRatePrior.t:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@BDDeathRate.t:$(n)'>
-            	<distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='1'/>
-            </prior>
+            <distribution id='BirthRatePrior.t:$(n)' spec='beast.base.spec.inference.distribution.Gamma' param='@BDBirthRate.t:$(n)' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.01" estimate="false"/>
+                <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="100.0" estimate="false"/>
+            </distribution>
+            <distribution id='DeathRatePrior.t:$(n)' spec='beast.base.spec.inference.distribution.Beta' param='@BDDeathRate.t:$(n)' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>
+                <beta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>
+            </distribution>
 
   		    <scale id='BirthRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@BDBirthRate.t:$(n)"/>
   		    <scale id='DeathRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@BDDeathRate.t:$(n)"/>
@@ -241,9 +243,10 @@ PopSizeScaler/index/=Operators/BactrianRateScaler/index/'>
   		    <operator id='PopSizeScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' 
   		    	scaleFactor="0.75" weight="3" parameter="@popSize.t:$(n)"/>
   		    	
-	        <prior id='PopSizePrior.t:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@popSize.t:$(n)'>
-	        	<distr spec="OneOnX"/>
-	        </prior>
+            <distribution id='PopSizePrior.t:$(n)' spec='beast.base.spec.inference.distribution.Gamma' param='@popSize.t:$(n)' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.01" estimate="false"/>
+                <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="100.0" estimate="false"/>
+            </distribution>
 ]]>
 			<plate fragment="TreeOperators" var="m" range="CoalescentConstant"/>
 
@@ -300,17 +303,15 @@ GrowthRateRandomWalk/index/=Operators/BactrianRandomWalk'>
 	        
 	        <operator id="GrowthRateRandomWalk.t:$(n)" spec="beast.base.spec.inference.operator.RealRandomWalkOperator" scaleFactor='0.1' weight="3" scalar="@growthRate.t:$(n)"/>
 
-	        <prior id='ePopSizePrior.t:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@ePopSize.t:$(n)'>
-	        	<distr spec="OneOnX"/>
-	        </prior>
-	        
-	        <prior id='GrowthRatePrior.t:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@growthRate.t:$(n)'>
-	        	<distr spec="LaplaceDistribution">
-	        		<parameter name="mu" value='0.001' estimate="false"/>
-	        		<parameter name="scale" value='0.5' estimate="false"/>
-	        	</distr>
-	        </prior>
+            <distribution id='ePopSizePrior.t:$(n)' spec='beast.base.spec.inference.distribution.Gamma' param='@ePopSize.t:$(n)' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.01" estimate="false"/>
+                <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="100.0" estimate="false"/>
+            </distribution>
 
+            <distribution id='GrowthRatePrior.t:$(n)' spec='beast.base.spec.inference.distribution.Laplace' param='@growthRate.t:$(n)' >
+                <mu spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.001" estimate="false"/>
+                <scale spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="0.5" estimate="false"/>
+            </distribution>
 ]]>
 			<plate fragment="TreeOperators" var="m" range="CoalescentExponential"/>
 
@@ -379,7 +380,7 @@ groupSizesDelta/index/=Operators/BactrianDeltaExchange/index/'>
 
             <distribution id='MarkovChainedPopSizes.t:$(n)' spec="beast.base.spec.inference.distribution.MarkovChainDistribution" 
 				jeffreys="true"
-				parameter="@bPopSizes.t:$(n)"/>
+				param="@bPopSizes.t:$(n)"/>
 
 		    <operator id='popSizesScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleVectorOperator' scaleFactor="0.75" weight="15" parameter="@bPopSizes.t:$(n)"/>
 		    <operator id='groupSizesDelta.t:$(n)' spec='beast.base.spec.inference.operator.DeltaExchangeOperator' delta="1" weight="6" integer="true"
@@ -458,23 +459,25 @@ EBSPLogger/mode/
                 <itree idref="treeIntervals.t:$(n)"/>
 			</population>
 
-            <prior id="populationMeanPrior.alltrees" spec="beast.base.spec.inference.distribution.Prior" scalar="@populationMean.alltrees">
-                <Gamma name="distr">
-                  	<alpha spec="parameter.RealParameter" value="0.01" estimate="false"/> 
-                  	<beta  spec="parameter.RealParameter" value="100.0" estimate="false"/>
-                </Gamma>
-            </prior>
+
+            <distribution id='populationMeanPrior.alltrees' spec='beast.base.spec.inference.distribution.Gamma' param='@populationMean.alltrees' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.01" estimate="false"/>
+                <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="100.0" estimate="false"/>
+            </distribution>
+
             <prior id="indicatorsPrior.alltrees" spec="beast.base.spec.inference.distribution.Prior">
                 <scalar arg="@indicators.alltrees" id="indsSun.alltrees" spec="beast.base.spec.evolution.Sum"/>
                 <distr spec="Poisson"  id='Poisson.EBSP'>
                     <parameter name="lambda" upper="0.0" value="0.69314718056" estimate='false'/>
                 </distr>
             </prior>
-            <prior id="popSizePrior.alltrees" spec="beast.base.spec.inference.distribution.Prior" vector="@popSizes.alltrees">
-                <Exponential id="popPriorDist.EBSP" name="distr">
-                     <mean spec="beast.base.spec.FunctionOfTensor" arg="@populationMean.alltrees"/>
-                </Exponential>
-            </prior>
+
+            <distribution id='popSizePrior.alltrees' spec='beast.base.spec.inference.distribution.IID' param='@popSizes.alltrees' >
+               <distr id='popPriorDist.EBSP' spec='beast.base.spec.inference.distribution.Exponential' param='@populationMean.alltrees' >
+                  <mean idref="populationMean.alltrees"/>
+               </distr>
+            </distribution>
+
 
             <logger id="EBSPLogger" fileName='EBSP.log' logEvery='5000' model="@demographic.alltrees">
                 <log idref='demographic.alltrees'/>

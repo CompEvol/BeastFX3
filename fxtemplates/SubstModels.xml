@@ -28,9 +28,18 @@ MutationRatePrior/index/=Priors/MutationRatePrior/
                 <shape               spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" id='gammaShape.s:$(n)' value='1.0' lower="0.1" estimate='false'/>
             </plugin>
 
-            <prior id='MutationRatePrior.s:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@mutationRate.s:$(n)'><distr spec="OneOnX"/></prior>
-            <prior id='GammaShapePrior.s:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@gammaShape.s:$(n)'><distr spec="beast.base.inference.distribution.Exponential" mean='1'/></prior>
-            <prior id='PropInvariantPrior.s:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@proportionInvariant.s:$(n)'><distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='1'/></prior>
+            <distribution id='MutationRatePrior.s:$(n)' spec='beast.base.spec.inference.distribution.Gamma' param='@mutationRate.s:$(n)' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="0.01" estimate="false"/>
+                <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="100.0" estimate="false"/>
+            </distribution>
+            <distribution id='GammaShapePrior.s:$(n)' spec='beast.base.spec.inference.distribution.Exponential' param='@gammaShape.s:$(n)' >
+                <mean spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>
+            </distribution>
+            <distribution id='PropInvariantPrior.s:$(n)' spec='beast.base.spec.inference.distribution.Beta' param='@proportionInvariant.s:$(n)' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>
+                <beta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>
+            </distribution>
+
 
             <operator id="AVMNOperator.$(n)" spec="beast.base.spec.evolution.operator.AdaptableVarianceMultivariateNormalOperator" weight="0.1" 
                 coefficient="1.0"
@@ -192,18 +201,16 @@ MutationRatePrior/index/=Priors/MutationRatePrior/
 	        <operator id='FrequenciesExchangerX.s:$(n)' spec='beast.base.spec.inference.operator.deltaexchange.RealDeltaExchangeOperator' delta="0.01" weight="0.1" parameter="@freqParameter.s:$(n)"/>
         </operator>
 
-        <prior id='kappa1Prior.s:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@kappa1.s:$(n)'>
-            <distr spec="LogNormalDistributionModel" meanInRealSpace='false'>
-                <parameter name='M' value="1.0" estimate='false'/>
-                <parameter name='S' value="1.25" estimate='false'/>
-            </distr>
-	</prior>
-        <prior id='kappa2Prior.s:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@kappa2.s:$(n)'>
-            <distr spec="LogNormalDistributionModel" meanInRealSpace='false'>
-                <parameter name='M' value="1.0" estimate='false'/>
-                <parameter name='S' value="1.25" estimate='false'/>
-            </distr>
-	</prior>
+        <distribution id='kappa1Prior.s:$(n)' spec='beast.base.spec.inference.distribution.LogNormal' param='@kappa1.s:$(n)' >
+                <M spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="1.0" estimate="false"/>
+                <S spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.25" estimate="false"/>
+        </distribution>
+
+        <distribution id='kappa2Prior.s:$(n)' spec='beast.base.spec.inference.distribution.LogNormal' param='@kappa2.s:$(n)' >
+                <M spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="1.0" estimate="false"/>
+                <S spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.25" estimate="false"/>
+        </distribution>
+
     <prior id='FrequenciesPrior.s:$(n)' vector='@freqParameter.s:$(n)' spec="beast.base.spec.inference.distribution.Prior">
 			<distr spec="beast.base.inference.distribution.Dirichlet">
                 <parameter spec="parameter.RealParameter" dimension="4" estimate="false" name="alpha">4.0 4.0 4.0 4.0</parameter>
@@ -324,12 +331,32 @@ RateGTPrior/index/=Priors/RateGTRPrior/,
 	        <operator id='FrequenciesExchangerX.s:$(n)' spec='beast.base.spec.inference.operator.deltaexchange.RealDeltaExchangeOperator' delta="0.01" weight="0.1" parameter="@freqParameter.s:$(n)"/>
         </operator>
 
-        <prior id='RateACPrior.s:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@rateAC.s:$(n)'><distr spec="beast.base.inference.distribution.Gamma"><parameter name="alpha" value='0.05' estimate='false'/><parameter name="beta" value='10.0' estimate='false'/></distr></prior>
-        <prior id='RateAGPrior.s:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@rateAG.s:$(n)'><distr spec="beast.base.inference.distribution.Gamma"><parameter name="alpha" value='0.05' estimate="false"/><parameter name="beta" value='20.0' estimate="false"/></distr></prior>
-        <prior id='RateATPrior.s:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@rateAT.s:$(n)'><distr spec="beast.base.inference.distribution.Gamma"><parameter name="alpha" value='0.05' estimate="false"/><parameter name="beta" value='10.0' estimate="false"/></distr></prior>
-        <prior id='RateCGPrior.s:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@rateCG.s:$(n)'><distr spec="beast.base.inference.distribution.Gamma"><parameter name="alpha" value='0.05' estimate="false"/><parameter name="beta" value='10.0' estimate="false"/></distr></prior>
-        <prior id='RateCTPrior.s:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@rateCT.s:$(n)'><distr spec="beast.base.inference.distribution.Gamma"><parameter name="alpha" value='0.05' estimate="false"/><parameter name="beta" value='20.0' estimate="false"/></distr></prior>
-        <prior id='RateGTPrior.s:$(n)' spec="beast.base.spec.inference.distribution.Prior" scalar='@rateGT.s:$(n)'><distr spec="beast.base.inference.distribution.Gamma"><parameter name="alpha" value='0.05' estimate="false"/><parameter name="beta" value='10.0' estimate="false"/></distr></prior>
+
+        <distribution id='RateACPrior.s:$(n)' spec='beast.base.spec.inference.distribution.Gamma' param='@rateAC.s:$(n)' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.05" estimate="false"/>
+                <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="10.0" estimate="false"/>
+        </distribution>
+        <distribution id='RateAGPrior.s:$(n)' spec='beast.base.spec.inference.distribution.Gamma' param='@rateAG.s:$(n)' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.05" estimate="false"/>
+                <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="20.0" estimate="false"/>
+        </distribution>
+        <distribution id='RateATPrior.s:$(n)' spec='beast.base.spec.inference.distribution.Gamma' param='@rateAT.s:$(n)' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.05" estimate="false"/>
+                <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="10.0" estimate="false"/>
+        </distribution>
+        <distribution id='RateCGPrior.s:$(n)' spec='beast.base.spec.inference.distribution.Gamma' param='@rateCG.s:$(n)' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.05" estimate="false"/>
+                <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="10.0" estimate="false"/>
+        </distribution>
+        <distribution id='RateCTPrior.s:$(n)' spec='beast.base.spec.inference.distribution.Gamma' param='@rateCT.s:$(n)' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.05" estimate="false"/>
+                <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="20.0" estimate="false"/>
+        </distribution>
+        <distribution id='RateGTPrior.s:$(n)' spec='beast.base.spec.inference.distribution.Gamma' param='@rateGT.s:$(n)' >
+                <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.05" estimate="false"/>
+                <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="10.0" estimate="false"/>
+        </distribution>
+
 
         <prior id='FrequenciesPrior.s:$(n)' vector='@freqParameter.s:$(n)' spec="beast.base.spec.inference.distribution.Prior">
 			<distr spec="beast.base.inference.distribution.Dirichlet">

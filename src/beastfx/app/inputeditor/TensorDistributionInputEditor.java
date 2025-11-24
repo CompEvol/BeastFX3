@@ -5,6 +5,7 @@ package beastfx.app.inputeditor;
 
 
 
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.ParameterizedType;
@@ -26,7 +27,6 @@ import beast.base.spec.domain.NonNegativeReal;
 import beast.base.spec.domain.PositiveInt;
 import beast.base.spec.domain.PositiveReal;
 import beast.base.spec.domain.Real;
-import beast.base.spec.inference.distribution.ScalarDistribution;
 import beast.base.spec.inference.distribution.TensorDistribution;
 import beast.base.spec.inference.parameter.BoolScalarParam;
 import beast.base.spec.inference.parameter.IntScalarParam;
@@ -34,6 +34,7 @@ import beast.base.spec.inference.parameter.RealScalarParam;
 import beast.base.spec.type.IntScalar;
 import beast.base.spec.type.RealScalar;
 import beast.base.spec.type.Scalar;
+import beast.base.spec.type.Tensor;
 import beastfx.app.util.FXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -51,12 +52,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
+public class TensorDistributionInputEditor extends BEASTObjectInputEditor {
 
-	public ScalarDistributionInputEditor() {
+	public TensorDistributionInputEditor() {
 		super();
 	}
-    public ScalarDistributionInputEditor(BeautiDoc doc) {
+    public TensorDistributionInputEditor(BeautiDoc doc) {
 		super(doc);
 	}
 
@@ -66,49 +67,44 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
     @Override
     public Class<?> type() {
         //return ParametricDistributionInputEditor.class;
-        return ScalarDistribution.class;
+        return TensorDistribution.class;
     }
 
     
-    static List<BeautiSubTemplate> scalarTemplates;
-    static List<ScalarDistribution<?,?>> templateInstances;
+    static List<BeautiSubTemplate> tensorTemplates;
+    static List<TensorDistribution<?,?>> templateInstances;
     static List<Class<?>> templateDomains;
     
     @Override
     public void init(Input<?> input, BEASTInterface beastObject, int itemNr, ExpandOption isExpandOption, boolean addButtons) {
         // useDefaultBehavior = !((beastObject instanceof beast.base.inference.distribution.Prior) || beastObject instanceof MRCAPrior || beastObject instanceof TreeDistribution);
         
-    	if (scalarTemplates == null) {
-    		Input<ScalarDistribution<?,?>> _input = new Input<>("param", "dummy input");
-        	_input.setType(ScalarDistribution.class);
-        	scalarTemplates = doc.getInputEditorFactory().getAvailableTemplates(_input, beastObject, null, doc);
+    	if (tensorTemplates == null) {
+    		Input<TensorDistribution<?,?>> _input = new Input<>("param", "dummy input");
+        	_input.setType(TensorDistribution.class);
+        	tensorTemplates = doc.getInputEditorFactory().getAvailableTemplates(_input, beastObject, null, doc);
 
         	templateInstances = new ArrayList<>();
         	templateDomains = new ArrayList<>();
             List<?> list = (List<?>) input.get();
             PartitionContext context = doc.getContextFor((BEASTInterface) list.get(itemNr));
-            ScalarDistribution<?,?> prior1 = (ScalarDistribution <?,?>) list.get(itemNr);
-        	for (BeautiSubTemplate template : scalarTemplates) {
-            	ScalarDistribution<?,?> newDist = (ScalarDistribution<?,?>) template.createSubNet(context, prior1, _input, true);
+            TensorDistribution<?,?> prior1 = (TensorDistribution <?,?>) list.get(itemNr);
+        	for (BeautiSubTemplate template : tensorTemplates) {
+        		TensorDistribution<?,?> newDist = (TensorDistribution<?,?>) template.createSubNet(context, prior1, _input, true);
             	templateInstances.add(newDist);
             	templateDomains.add(getDomain(newDist));
         	}
     	}
     	
     	
-        useDefaultBehavior = !(beastObject instanceof ScalarDistribution) || 
-        		((ScalarDistribution<?,?>)beastObject).getApacheDistribution() == null;
+        useDefaultBehavior = true;
 
         m_bAddButtons = addButtons;
         m_input = input;
-        if (beastObject instanceof ScalarDistribution<?, ?>) {
-            m_beastObject = beastObject;        	
-        } else {
-            m_beastObject = (ScalarDistribution<?, ?>) input.get();
-        }
+        m_beastObject = beastObject;
 		this.itemNr = itemNr;
         if (input.get() != null) {
-            super.init(input, m_beastObject, itemNr, ExpandOption.FALSE, addButtons);
+            super.init(input, beastObject, itemNr, ExpandOption.FALSE, addButtons);
         } else {
         	pane = new HBox();
         }
@@ -117,7 +113,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
         
         
         
-        ScalarDistribution<?,?> prior = (ScalarDistribution<?,?>) m_beastObject;
+        TensorDistribution<?,?> prior = (TensorDistribution<?,?>) beastObject;
         if (prior.paramInput.get() instanceof RealScalar p) {
             // add range button for real parameters
             Button rangeButton = new Button(paramToString(p));
@@ -125,7 +121,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
                 Button rangeButton1 = (Button) e.getSource();
 
                 List<?> list = (List<?>) m_input.get();
-                ScalarDistribution<?,?> prior1 = (ScalarDistribution<?,?>) list.get(itemNr);
+                TensorDistribution<?,?> prior1 = (TensorDistribution<?,?>) list.get(itemNr);
                 BEASTInterface p1 = (BEASTInterface) prior1.paramInput.get();
                 BEASTObjectDialog dlg = new BEASTObjectDialog(p1, RealScalar.class, doc);
                 if (dlg.showDialog()) {
@@ -146,7 +142,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
                 Button rangeButton1 = (Button) e.getSource();
 
                 List<?> list = (List<?>) m_input.get();
-                ScalarDistribution<?,?> prior1 = (ScalarDistribution<?,?>) list.get(itemNr);
+                TensorDistribution<?,?> prior1 = (TensorDistribution<?,?>) list.get(itemNr);
                 BEASTInterface p1 = (BEASTInterface) prior1.paramInput.get();
                 BEASTObjectDialog dlg = new BEASTObjectDialog(p1, IntScalar.class, doc);
                 if (dlg.showDialog()) {
@@ -173,7 +169,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
     } // init
 
 
-	private Class<?> getDomain(ScalarDistribution<?, ?> value) {
+	private Class<?> getDomain(TensorDistribution<?, ?> value) {
 		if (value == null) {
 			return null;
 		}
@@ -187,15 +183,6 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
         	Class<?> type = (Class<?>) types[0];
         	return type;
         }
-        
-//        if (superclass instanceof ParameterizedType pt) {
-//            Type [] types = pt.getActualTypeArguments();
-//            if (types[0] instanceof ParameterizedType pt2) {
-//                Type [] types2 = pt2.getActualTypeArguments();
-//            	Class<?> type = (Class<?>) types2[0];
-//            	return type;
-//            }
-//        }
         
         Log.warning("Cannot determine Domain of " + value.getClass().getName());
         
@@ -269,268 +256,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
      */
     final static int[] NR_OF_TICKS = new int[]{5, 10, 8, 6, 8, 10, 6, 7, 8, 9, 10};
 
-    PDPanel graphPanel;
     
-    /* class for drawing information for a parametric distribution **/
-    class PDPanel extends VBox {
-    	
-    	LineChart<Number,Number> chart;
-    	LineChart.Series<Number,Number> series;
-    	Label infoLabel1, infoLabel2, infoLabel3;
-    	
-        // the margin to the left of y-labels
-        private static final int MARGIN_LEFT_OF_Y_LABELS = 5;
-
-        private static final int POINTS = 1000;
-
-        int m_nTicks;
-
-        PDPanel() {
-    		NumberAxis xAxis = new NumberAxis();
-    		xAxis.setForceZeroInRange(false);
-            //xAxis.setLabel("x");                
-            NumberAxis yAxis = new NumberAxis();        
-            yAxis.setLabel("p(x)");
-            chart = new LineChart<Number,Number>(xAxis,yAxis);
-            //chart.setAnimated(false);
-            chart.setLegendVisible(false);
-            chart.setCreateSymbols(false);
-            chart.getXAxis().setAutoRanging(true);
-            chart.getYAxis().setAutoRanging(true);
-            series = new LineChart.Series<>();
-	        for (int i = 0; i < POINTS; i++) {
-	        	series.getData().add(new XYChart.Data<Number,Number>(0,0));
-	        }
-	        chart.getData().add(series);
-	        getChildren().add(chart);
-	        
-	    	infoLabel1 = new Label();
-	    	infoLabel1.setStyle("-fx-font-size:6pt;");
-	    	infoLabel1.setPadding(new Insets(0, 10, 0, MARGIN_LEFT_OF_Y_LABELS));
-	    	infoLabel2 = new Label();
-	    	infoLabel2.setStyle("-fx-font-size:6pt;");
-	    	infoLabel2.setPadding(new Insets(0, 100, 0, MARGIN_LEFT_OF_Y_LABELS));
-	    	infoLabel3 = new Label();
-	    	infoLabel3.setStyle("-fx-font-size:6pt;");
-	    	HBox box = new HBox();
-	    	// box.setSpacing(50);
-	    	box.setAlignment(Pos.CENTER);
-	    	box.getChildren().addAll(infoLabel1, infoLabel2, infoLabel3);
-	    	getChildren().add(box);
-        }
-        
-        // @Override
-        synchronized private void paintComponent() {
-            TensorDistribution<?,?> distr = (TensorDistribution<?,?>) m_beastObject;
-            if (distr == null || !(distr instanceof ScalarDistribution)) {
-                drawError();
-            } else {
-                try {
-                    distr.initAndValidate();
-                    drawGraph((ScalarDistribution<?,?>) distr);
-                } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
-                    drawError();
-                }
-            }
-
-        }
-
-        private void drawError() {
-        	// chart.getData().clear();
-//            g.setFill(Color.WHITE);
-//            g.fillRect(0, 0, getWidth(), getHeight());
-//            g.setStroke(Color.BLACK);
-//            g.rect(0, 0, getWidth()-1, getHeight()-1);
-//
-//            String errorString = "Cannot display distribution.";
-//            
-//            int stringWidth = stringWidth(errorString);
-//            int stringHeight = stringHeight(errorString);
-//            g.strokeText(errorString,
-//                    (getWidth() - stringWidth)/2,
-//                    (getHeight() - stringHeight)/2);
-        }
-
-		private void drawGraph(ScalarDistribution<?,?> m_distr) {//, int labelOffset) {
-            Bounded<?> param = getParameter();
-
-            double minValue = 0.1;
-            double maxValue = 1;
-            try {
-                minValue = m_distr.inverseCumulativeProbability(0.01);
-            } catch (Throwable e) {
-                // use default
-            }
-            try {
-                maxValue = m_distr.inverseCumulativeProbability(0.99);
-            } catch (Throwable e) {
-            	// use default
-            }
-            double lowerParam = param == null ? 0 :
-            	param.getLower() instanceof Integer ? (int) param.getLower() : (double) param.getLower(); 
-            if (param != null && minValue < lowerParam) {
-            	minValue = minValue + 0.99999 * (lowerParam - minValue);
-            }
-            double upperParam = param == null ? 0 :
-            	param.getUpper() instanceof Integer ? (int) param.getUpper() : (double) param.getUpper(); 
-            if (param != null && maxValue > upperParam) {
-            	maxValue = (double) param.getUpper() + 0.001 * (maxValue - upperParam);
-            }
-            double xRange = maxValue - minValue;
-            // adjust yMax so that the ticks come out right
-            if (minValue > 0 && minValue - xRange < 0) {
-            	minValue = 0 + 1e-5;
-            }
-            xRange = maxValue - minValue;
-            int k = 0;
-
-            int points;
-            if (!m_distr.isIntegerDistribution()) {
-                points = POINTS;
-            } else {
-                points = (int) (xRange);
-            }
-            double[] xPoints = new double[points];
-            double[] fyPoints = new double[points];
-            double yMax = 0;
-            
-            for (int i = 0; i < points; i++) {
-            	xPoints[i] = minValue + (xRange * i) / points;
-            	double y0 = minValue + (xRange * i) / points;
-            	if (param != null && (y0 < lowerParam || y0 > upperParam)) {
-            		fyPoints[i] = 0;
-            	} else {
-            		fyPoints[i] = getDensityForPlot(m_distr, y0);
-            	}
-                if (Double.isInfinite(fyPoints[i]) || Double.isNaN(fyPoints[i])) {
-                    fyPoints[i] = 0;
-                }
-                yMax = Math.max(yMax, fyPoints[i]);
-            }
-            yMax = adjust(yMax);
-
-
-            for (int i = 0; i < points; i++) {
-            	Data<Number, Number> p = series.getData().get(i);
-            	p.setXValue(xPoints[i]);
-            	p.setYValue(fyPoints[i]);
-            }
-            synchronized (this) {
-                if (chart.getData().size() == 0) {
-                	try {
-                		chart.getData().add(series);
-                	} catch (IllegalArgumentException e) {
-                		// ignore
-                	}
-                }
-			}
-
-            String info1 = "", info2 = "", info3 = "";
-            String[] strs = new String[]{"2.5% Quantile", "5% Quantile", "Median", "95% Quantile", "97.5% Quantile"};
-            Double[] quantiles = new Double[]{0.025, 0.05, 0.5, 0.95, 0.975};
-            mayBeUnstable = false;
-            for (k = 0; k < 5; k++) {
-                try {
-                    info2 += format(m_distr.inverseCumulativeProbability(quantiles[k]));
-                } catch (MathException | RuntimeException e) {
-                	info2 += "not available";
-                }
-                info1 += strs[k] + "\n";
-                info2 += "\n";
-            }
-            if (mayBeUnstable) {
-                info1 += "* numbers\n";
-                info1 += "may not be\n";
-                info1 += "accurate\n";
-            }
-            try {
-            	info3 += "mean " + format(m_distr.getMean());
-            } catch (RuntimeException e) {
-                // catch in case it is not implemented.
-            }
-            infoLabel1.setText(info1);
-            infoLabel2.setText(info2);
-            infoLabel3.setText(info3);
-        }
-
-		private String format(double value) {
-            StringWriter writer = new StringWriter();
-            PrintWriter pw = new PrintWriter(writer);
-            pw.printf("%.3g", value);
-            if (value != 0.0 && Math.abs(value) / 1000 < 1e-320) { // 2e-6 = 2 * AbstractContinuousDistribution.solverAbsoluteAccuracy
-            	mayBeUnstable = true;
-            	pw.printf("*");
-            }
-            pw.flush();
-            return writer.toString();
-        }
-        
-        private double adjust(double yMax) {
-            // adjust yMax so that the ticks come out right
-            int k = 0;
-            double y = yMax;
-            while (y > 10) {
-                y /= 10;
-                k++;
-            }
-            while (y < 1 && y > 0) {
-                y *= 10;
-                k--;
-            }
-            y = Math.ceil(y);
-            m_nTicks = NR_OF_TICKS[(int) y];
-            for (int i = 0; i < k; i++) {
-                y *= 10;
-            }
-            for (int i = k; i < 0; i++) {
-                y /= 10;
-            }
-            return y;
-        }
-    }
-    
-    /**
-     * Returns the density of pDistr at x when pDistr is a density of a
-     * continuous variable, but returns the probability of the closest
-     * integer when pDistr is a probability distribution over an integer-valued
-     * parameter.
-     * 
-     * @param pDistr
-     * @param x
-     * @return density at x or probability of closest integer to x
-     */
-    private double getDensityForPlot(ScalarDistribution<?,?> distr, double x) {
-        if (distr.isIntegerDistribution()) {
-            return distr.density((int) Math.round(x));
-        } else {
-            return distr.density(x);
-        }
-    }
-
-    public Bounded<?> getParameter() {
-    	if (m_beastObject instanceof TensorDistribution td) {
-    		Object o = td.paramInput.get();
-    		if (o instanceof Bounded b) {
-    			return b;
-    		}
-    	}
-		return null;
-	}
-	private Node createGraph() {
-    	graphPanel = new PDPanel();
-        graphPanel.paintComponent();
-        return graphPanel;
-    }
-    
-    
-    @Override
-    public void validateInput() {
-    	if (graphPanel != null) {
-    		graphPanel.paintComponent();
-    	}
-		super.validateInput();
-    }
 
     
 	private ComboBox<BeautiSubTemplate> comboBox;
@@ -539,17 +265,13 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
 		ComboBox<BeautiSubTemplate> comboBox = new ComboBox<>();
 
         TensorDistribution<?,?> prior = (TensorDistribution<?,?>) m_beastObject;
-        
-        String text = prior.paramInput.get() != null ? ((BEASTInterface)prior.paramInput.get()).getID() : prior.getID();
+        String text = ((BEASTInterface)prior.paramInput.get()).getID();
 
         int k = 0;
-        ScalarDistribution<?,?> distr = (ScalarDistribution<?,?>) (
-        		(prior instanceof ScalarDistribution<?,?>) ?
-        				m_beastObject :
-        				m_input.get());
+        TensorDistribution<?,?> distr = (TensorDistribution<?,?>) m_beastObject;
         Object param = distr.paramInput.get();
         Class<?> domain = getParameterDomain(param);
-        for (BeautiSubTemplate template : scalarTemplates) {
+        for (BeautiSubTemplate template : tensorTemplates) {
         	if (isCompatible(domain, templateDomains.get(k++))) {
         		comboBox.getItems().add(template);
         	}
@@ -577,7 +299,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
 
         id = prior.getClass().getName();
         		// id.substring(0, id.indexOf('.'));
-        for (BeautiSubTemplate template : scalarTemplates) {
+        for (BeautiSubTemplate template : tensorTemplates) {
             if (template.classInput.get() != null && template._class.getName().equals(id)) {
                 comboBox.setValue(template);
             }
@@ -590,12 +312,12 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
 
             BeautiSubTemplate template = (BeautiSubTemplate) comboBox1.getValue();
             PartitionContext context = doc.getContextFor((BEASTInterface) list.get(itemNr));
-            ScalarDistribution<?,?> prior1 = (ScalarDistribution<?,?>) list.get(itemNr);
+            TensorDistribution<?,?> prior1 = (TensorDistribution<?,?>) list.get(itemNr);
             try {
-            	Object o = ((ScalarDistribution<?,?>) m_beastObject).paramInput.get();
-            	Input<ScalarDistribution<?,?>> input_ = new Input<>("param", "dummy input");
-            	input_.setType(ScalarDistribution.class);
-            	ScalarDistribution<?,?> newDist = (ScalarDistribution<?,?>) template.createSubNet(context, prior1, input_, true);
+            	Object o = ((TensorDistribution<?,?>) m_beastObject).paramInput.get();
+            	Input<TensorDistribution<?,?>> input_ = new Input<>("param", "dummy input");
+            	input_.setType(TensorDistribution.class);
+            	TensorDistribution<?,?> newDist = (TensorDistribution<?,?>) template.createSubNet(context, prior1, input_, true);
             	newDist.paramInput.setValue(o, newDist);
             	list.set(itemNr, newDist);
             	newDist.setID(m_beastObject.getID());
@@ -723,7 +445,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
 		vbox.getChildren().addAll(expandBox.getChildren());
 		HBox hbox = FXUtils.newHBox();
 		hbox.getChildren().add(vbox);
-		hbox.getChildren().add(createGraph());
+//		hbox.getChildren().add(createGraph());
 		
 		expandBox.getChildren().clear();
 		expandBox.getChildren().add(hbox);
