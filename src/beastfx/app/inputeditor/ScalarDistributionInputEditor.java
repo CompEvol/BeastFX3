@@ -51,7 +51,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
+public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implements HasExpandBox {
 
 	public ScalarDistributionInputEditor() {
 		super();
@@ -99,12 +99,16 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
         useDefaultBehavior = !(beastObject instanceof ScalarDistribution) || 
         		((ScalarDistribution<?,?>)beastObject).getApacheDistribution() == null;
 
+        if (useDefaultBehavior && (beastObject instanceof TensorDistribution)) {
+        	useDefaultBehavior = false;
+        }
+        
         m_bAddButtons = addButtons;
         m_input = input;
         if (beastObject instanceof ScalarDistribution<?, ?>) {
             m_beastObject = beastObject;        	
         } else {
-            m_beastObject = (ScalarDistribution<?, ?>) input.get();
+            m_beastObject = (ScalarDistribution<?, ?>) beastObject.getInput("distr").get(); 
         }
 		this.itemNr = itemNr;
         if (input.get() != null) {
@@ -535,7 +539,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
     
 	private ComboBox<BeautiSubTemplate> comboBox;
 
-	private ComboBox<BeautiSubTemplate> createComboBox() {
+	protected ComboBox<BeautiSubTemplate> createComboBox() {
 		ComboBox<BeautiSubTemplate> comboBox = new ComboBox<>();
 
         TensorDistribution<?,?> prior = (TensorDistribution<?,?>) m_beastObject;
@@ -546,7 +550,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
         ScalarDistribution<?,?> distr = (ScalarDistribution<?,?>) (
         		(prior instanceof ScalarDistribution<?,?>) ?
         				m_beastObject :
-        				m_input.get());
+        					m_beastObject.getInput("distr").get());//m_input.get());
         Object param = distr.paramInput.get();
         Class<?> domain = getParameterDomain(param);
         for (BeautiSubTemplate template : scalarTemplates) {
@@ -563,7 +567,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
         		super.updateItem(item, empty);
         		if (!empty && item != null) {
         			if (expandBox !=null && expandBox.isVisible()) {
-        				setText(item.toString());
+        				setText(item.toString() + getParameters());
         			} else {
         				setText(item.toString() + getParameters());
         			}
@@ -576,7 +580,10 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
         String id = prior.getID();
 
         id = prior.getClass().getName();
-        		// id.substring(0, id.indexOf('.'));
+        if (!(prior instanceof ScalarDistribution<?,?>)) {
+        	id = ((BEASTInterface)prior.getInput("distr").get()).getClass().getName();
+        }
+        		        		// id.substring(0, id.indexOf('.'));
         for (BeautiSubTemplate template : scalarTemplates) {
             if (template.classInput.get() != null && template._class.getName().equals(id)) {
                 comboBox.setValue(template);
@@ -586,21 +593,36 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
             @SuppressWarnings("unchecked")
 			ComboBox<BeautiSubTemplate> comboBox1 = (ComboBox<BeautiSubTemplate>) e.getSource();
 
-            List<Distribution> list = (List<Distribution>) m_input.get();
-
-            BeautiSubTemplate template = (BeautiSubTemplate) comboBox1.getValue();
-            PartitionContext context = doc.getContextFor((BEASTInterface) list.get(itemNr));
-            ScalarDistribution<?,?> prior1 = (ScalarDistribution<?,?>) list.get(itemNr);
+            
             try {
-            	Object o = ((ScalarDistribution<?,?>) m_beastObject).paramInput.get();
-            	Input<ScalarDistribution<?,?>> input_ = new Input<>("param", "dummy input");
-            	input_.setType(ScalarDistribution.class);
-            	ScalarDistribution<?,?> newDist = (ScalarDistribution<?,?>) template.createSubNet(context, prior1, input_, true);
-            	newDist.paramInput.setValue(o, newDist);
-            	list.set(itemNr, newDist);
-            	newDist.setID(m_beastObject.getID());
-            	doc.pluginmap.remove(m_beastObject.getID());
-            	doc.registerPlugin(newDist);
+	            if (m_input.get() instanceof List) {
+		            List<Distribution> list = (List<Distribution>) m_input.get();
+		
+		            BeautiSubTemplate template = (BeautiSubTemplate) comboBox1.getValue();
+		            PartitionContext context = doc.getContextFor((BEASTInterface) list.get(itemNr));
+		            
+		            Object item = list.get(itemNr);
+		            if (item instanceof ScalarDistribution<?,?>) {
+			            ScalarDistribution<?,?> prior1 = null;
+		            	prior1 = (ScalarDistribution<?,?>) list.get(itemNr);
+		            	Object o = ((ScalarDistribution<?,?>) m_beastObject).paramInput.get();
+		            	Input<ScalarDistribution<?,?>> input_ = new Input<>("param", "dummy input");
+		            	input_.setType(ScalarDistribution.class);
+		            	ScalarDistribution<?,?> newDist = (ScalarDistribution<?,?>) template.createSubNet(context, prior1, input_, true);
+		            	newDist.paramInput.setValue(o, newDist);
+		            	list.set(itemNr, newDist);
+		            	newDist.setID(m_beastObject.getID());
+		            	doc.pluginmap.remove(m_beastObject.getID());
+		            	doc.registerPlugin(newDist);
+		            } else {
+		            	ScalarDistribution<?,?> newDist = (ScalarDistribution<?,?>) template.createSubNet(context, m_beastObject, m_beastObject.getInput("distr"), true);
+		            }
+	            } else {
+		    		
+		            BeautiSubTemplate template = (BeautiSubTemplate) comboBox1.getValue();
+		            PartitionContext context = doc.getContextFor((BEASTInterface) m_beastObject);
+	            	ScalarDistribution<?,?> newDist = (ScalarDistribution<?,?>) template.createSubNet(context, m_beastObject, m_input, true);
+	            }
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
@@ -687,23 +709,41 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
     	for (Input<?> input: distr.listInputs()) {
     		if (!input.getName().equals("param")) {
     		Object o = input.get();
-	    		if (o != null && (o instanceof RealScalarParam<?> ||o instanceof IntScalarParam || o instanceof BoolScalarParam)) {
-	    			BEASTInterface p = (BEASTInterface) o;
-	    			if (b == null) {
-	    				b = new StringBuilder();
-	    				b.append(p.getInput("value").get().toString().trim());
-	    			} else {
-	    				b.append(',');
-	    				b.append(p.getInput("value").get().toString().trim());
-	    			}
-	    		} else if (o != null && o instanceof Double && !input.getName().equals("offset")) {
-	    			Double p = (Double) o;
-	    			if (b == null) {
-	    				b = new StringBuilder();
-	    				b.append(p);
-	    			} else {
-	    				b.append(',');
-	    				b.append(p);
+	    		if (o != null) {
+	    			if (o instanceof RealScalarParam<?> p) {
+		    			if (b == null) {
+		    				b = new StringBuilder();
+		    				b.append((p.get()+"").trim());
+		    			} else {
+		    				b.append(',');
+		    				b.append((p.get()+"").trim());
+		    			}
+	    			} else if (o instanceof IntScalarParam p) {
+		    			if (b == null) {
+		    				b = new StringBuilder();
+		    				b.append((p.get()+"").trim());
+		    			} else {
+		    				b.append(',');
+		    				b.append((p.get()+"").trim());
+		    			}
+	    			} else if (o instanceof BoolScalarParam p) {
+		    			if (b == null) {
+		    				b = new StringBuilder();
+		    				b.append((p.get()+"").trim());
+		    			} else {
+		    				b.append(',');
+		    				b.append((p.get()+"").trim());
+		    			}
+	    				
+	    			} else if (o instanceof Double && !input.getName().equals("offset")) {
+		    			Double p = (Double) o;
+		    			if (b == null) {
+		    				b = new StringBuilder();
+		    				b.append(p);
+		    			} else {
+		    				b.append(',');
+		    				b.append(p);
+		    			}
 	    			}
 	    		}
     		}
@@ -716,6 +756,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor {
     
     VBox expandBox = null;
     
+    @Override
 	public void setExpandBox(VBox expandBox) {
 		this.expandBox = expandBox;
 		

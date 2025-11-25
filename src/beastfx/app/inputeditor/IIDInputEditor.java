@@ -28,6 +28,7 @@ import beast.base.spec.domain.NonNegativeReal;
 import beast.base.spec.domain.PositiveInt;
 import beast.base.spec.domain.PositiveReal;
 import beast.base.spec.domain.Real;
+import beast.base.spec.inference.distribution.IID;
 import beast.base.spec.inference.distribution.ScalarDistribution;
 import beast.base.spec.inference.distribution.TensorDistribution;
 import beast.base.spec.inference.parameter.BoolScalarParam;
@@ -58,12 +59,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-public class TensorDistributionInputEditor extends BEASTObjectInputEditor implements HasExpandBox {
+public class IIDInputEditor extends ScalarDistributionInputEditor {
 
-	public TensorDistributionInputEditor() {
+	public IIDInputEditor() {
 		super();
 	}
-    public TensorDistributionInputEditor(BeautiDoc doc) {
+    public IIDInputEditor(BeautiDoc doc) {
 		super(doc);
 	}
 
@@ -73,7 +74,7 @@ public class TensorDistributionInputEditor extends BEASTObjectInputEditor implem
     @Override
     public Class<?> type() {
         //return ParametricDistributionInputEditor.class;
-        return TensorDistribution.class;
+        return IID.class;
     }
 
     
@@ -110,12 +111,15 @@ public class TensorDistributionInputEditor extends BEASTObjectInputEditor implem
         m_beastObject = beastObject;
 		this.itemNr = itemNr;
         if (input.get() != null) {
-            super.init(input, beastObject, itemNr, ExpandOption.FALSE, addButtons);
+        	pane = new HBox();
+            //super.init(input, beastObject, itemNr, ExpandOption.FALSE, addButtons);
         } else {
         	pane = new HBox();
         }
         pane.getChildren().add(createComboBox());
-        
+        pane.getChildren().add(super.createComboBox());
+        getChildren().add(pane);
+ 
         
         
         
@@ -273,7 +277,7 @@ public class TensorDistributionInputEditor extends BEASTObjectInputEditor implem
     
 	private ComboBox<BeautiSubTemplate> comboBox;
 
-	private ComboBox<BeautiSubTemplate> createComboBox() {
+	protected ComboBox<BeautiSubTemplate> createComboBox() {
 		ComboBox<BeautiSubTemplate> comboBox = new ComboBox<>();
 
         TensorDistribution<?,?> prior = (TensorDistribution<?,?>) m_beastObject;
@@ -355,7 +359,6 @@ public class TensorDistributionInputEditor extends BEASTObjectInputEditor implem
         if (tipText != null) {
         	comboBox.setTooltip(new Tooltip(tipText));
         }
-        
         
         return comboBox;
 
@@ -447,36 +450,5 @@ public class TensorDistributionInputEditor extends BEASTObjectInputEditor implem
 		}
 		return "[" + b.toString().replaceAll("[\\]\\[]", "") + "]";
 	}
-    
-    VBox expandBox = null;
-    
-	public void setExpandBox(VBox expandBox) {
-		this.expandBox = expandBox;
-		
-		VBox vbox = FXUtils.newVBox();
-		vbox.getChildren().addAll(expandBox.getChildren());
-		HBox hbox = FXUtils.newHBox();
-		hbox.getChildren().add(vbox);
-//		hbox.getChildren().add(createGraph());
-		
-		expandBox.getChildren().clear();
-		expandBox.getChildren().add(hbox);
-
-		for (Node node : vbox.getChildren()) {
-			if (node instanceof InputEditor ie) {
-				ie.addValidationListener(this);
-			}
-		}
-		
-		this.expandBox.visibleProperty().addListener((o, oldVal, newVal) -> {
-			if (comboBox != null) {
-				Pane parent = (Pane) comboBox.getParent();
-				int i = parent.getChildren().indexOf(comboBox);
-				comboBox = createComboBox();
-				parent.getChildren().set(i, comboBox);
-			}
-     });
-	}
-
 	
 }

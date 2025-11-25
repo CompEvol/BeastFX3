@@ -327,14 +327,8 @@ System.err.println("BEASTObjectPanel.countInputs(beastObject, doc) = 0");
         		expandBox.setManaged(true);
         	}
             
-            if (editor instanceof PriorInputEditor) {
-            	((PriorInputEditor)editor).setExpandBox(expandBox);
-            }
-            if (editor instanceof MRCAPriorInputEditor) {
-            	((MRCAPriorInputEditor)editor).setExpandBox(expandBox);
-            }
-            if (editor instanceof ScalarDistributionInputEditor) {
-            	((ScalarDistributionInputEditor)editor).setExpandBox(expandBox);
+            if (editor instanceof HasExpandBox heb) {
+            	heb.setExpandBox(expandBox);
             }
         } else {
         	editButtonIsVisible = false;

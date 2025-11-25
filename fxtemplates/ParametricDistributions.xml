@@ -157,6 +157,24 @@
             </distr> 
 ]]>
         </subtemplate>
+
+        <!-- IID -->
+        <subtemplate id='IID' class='beast.base.spec.inference.distribution.IID' mainid='[top]'
+        	suppressInputs='beast.base.spec.inference.distribution.IID.param'
+            hmc='
+            IID/alpha/=ParametricDistributions/IID/mean/,
+            IID/offset/=ParametricDistributions/IID/offset/'>
+            <![CDATA[
+			<distr spec="beast.base.spec.inference.distribution.IID">
+	            <param spec="beast.base.spec.inference.parameter.RealVectorParam" dimension="2" domain="Real" lower="1.0E-9" upper="Infinity">1.0</param>
+        		<distr spec="beast.base.spec.inference.distribution.Uniform">
+		        	<lower spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="-1e307" estimate="false"/>
+		        	<upper spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="1e307" estimate="false"/>
+        		</distr>
+            </distr> 
+]]>
+        </subtemplate>
+
     </mergewith>
 
 

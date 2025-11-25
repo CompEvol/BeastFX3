@@ -34,7 +34,7 @@ import beast.base.inference.distribution.OneOnX;
 import beast.base.parser.PartitionContext;
 
 
-public class MRCAPriorInputEditor extends InputEditor.Base {
+public class MRCAPriorInputEditor extends InputEditor.Base implements HasExpandBox {
 
 	public MRCAPriorInputEditor(BeautiDoc doc) {
 		super(doc);
@@ -352,6 +352,8 @@ public class MRCAPriorInputEditor extends InputEditor.Base {
 	}
 
     VBox expandBox = null;
+    
+    @Override
 	public void setExpandBox(VBox expandBox) {
 		this.expandBox = expandBox;
 	}

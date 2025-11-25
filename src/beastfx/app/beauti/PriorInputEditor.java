@@ -20,6 +20,7 @@ import javafx.scene.text.Font;
 import beastfx.app.inputeditor.BEASTObjectDialog;
 import beastfx.app.inputeditor.BeautiDoc;
 import beastfx.app.inputeditor.BeautiSubTemplate;
+import beastfx.app.inputeditor.HasExpandBox;
 import beastfx.app.inputeditor.InputEditor;
 import beastfx.app.inputeditor.ListInputEditor;
 import beastfx.app.util.FXUtils;
@@ -34,7 +35,7 @@ import beast.base.inference.parameter.IntegerParameter;
 import beast.base.inference.parameter.RealParameter;
 import beast.base.parser.PartitionContext;
 
-public class PriorInputEditor extends InputEditor.Base {
+public class PriorInputEditor extends InputEditor.Base implements HasExpandBox {
 
 	public PriorInputEditor(BeautiDoc doc) {
 		super(doc);
@@ -187,6 +188,8 @@ public class PriorInputEditor extends InputEditor.Base {
 
     
     VBox expandBox = null;
+    
+    @Override
 	public void setExpandBox(VBox expandBox) {
 		this.expandBox = expandBox;
 		this.expandBox.visibleProperty().addListener((o, oldVal, newVal) -> {
