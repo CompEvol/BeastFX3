@@ -9,8 +9,8 @@ import beast.base.evolution.branchratemodel.BranchRateModel;
 import beast.base.inference.Distribution;
 import beast.base.inference.Operator;
 import beast.base.inference.StateNode;
-import beast.base.inference.distribution.ParametricDistribution;
 import beast.base.parser.PartitionContext;
+import beast.base.spec.inference.distribution.ScalarDistribution;
 import beast.base.spec.inference.parameter.BoolScalarParam;
 import beast.base.spec.inference.parameter.IntScalarParam;
 import beast.base.spec.inference.parameter.RealScalarParam;
@@ -209,7 +209,7 @@ public class ScalarInputEditor extends BEASTObjectInputEditor {
             //m_bAddButtons = false;
             if (itemNr < 0) {
 	            for (Object beastObject2 : ((BEASTInterface) m_input.get()).getOutputs()) {
-	                if (beastObject2 instanceof ParametricDistribution) {
+	                if (beastObject2 instanceof RealScalarParam) {
 	                    m_isEstimatedBox.setVisible(doc.allowLinking);
 	                    m_isEstimatedBox.setVisible(true);
 	                	isParametricDistributionParameter = true;
@@ -259,10 +259,10 @@ public class ScalarInputEditor extends BEASTObjectInputEditor {
             	
 
             	if (id.startsWith("RealParameter")) {
-                	ParametricDistribution parent = null; 
+                	ScalarDistribution<?,?> parent = null; 
     	            for (Object beastObject2 : parameter2.getOutputs()) {
-    	                if (beastObject2 instanceof ParametricDistribution) {
-                    		parent = (ParametricDistribution) beastObject2; 
+    	                if (beastObject2 instanceof ScalarDistribution<?,?>) {
+                    		parent = (ScalarDistribution<?,?>) beastObject2; 
     	                    break;
     	                }
     	            }
