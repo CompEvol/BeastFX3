@@ -171,7 +171,10 @@ public class FXUtils {
 		}
 		
 		if (!hmcPages.containsKey(id + "/" + input.getName() + "/")) {
-			return;
+			id = o.getClass().getSimpleName();
+			if (!hmcPages.containsKey(id + "/" + input.getName() + "/")) {
+				return;
+			}
 		}
 		//System.out.print(id + "/" + input.getName() + "/ => ");
 		id = hmcPages.get(id + "/" + input.getName() + "/");		

@@ -32,7 +32,9 @@ import beast.base.spec.inference.parameter.BoolScalarParam;
 import beast.base.spec.inference.parameter.IntScalarParam;
 import beast.base.spec.inference.parameter.RealScalarParam;
 import beast.base.spec.type.IntScalar;
+import beast.base.spec.type.IntVector;
 import beast.base.spec.type.RealScalar;
+import beast.base.spec.type.RealVector;
 import beast.base.spec.type.Scalar;
 import beastfx.app.util.FXUtils;
 import javafx.geometry.Insets;
@@ -47,9 +49,15 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implements HasExpandBox {
 
@@ -99,24 +107,38 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
         useDefaultBehavior = !(beastObject instanceof ScalarDistribution) || 
         		((ScalarDistribution<?,?>)beastObject).getApacheDistribution() == null;
 
-        if (useDefaultBehavior && (beastObject instanceof TensorDistribution)) {
-        	useDefaultBehavior = false;
-        }
-        
         m_bAddButtons = addButtons;
         m_input = input;
+
         if (beastObject instanceof ScalarDistribution<?, ?>) {
             m_beastObject = beastObject;        	
         } else {
+        	// m_input = beastObject.getInput("distr");
             m_beastObject = (ScalarDistribution<?, ?>) beastObject.getInput("distr").get(); 
         }
+
+        if (useDefaultBehavior && (beastObject instanceof TensorDistribution)) {
+        	useDefaultBehavior = false;
+        	pane = new HBox();
+        	expandedInit(input, beastObject);
+        	pane = (Pane) pane.getChildren().get(1);
+            registerAsListener(pane);
+            getChildren().add(pane);
+            return;
+        	//useDefaultBehavior = false;
+        }
+        
+        //m_bAddButtons = true;
+        
 		this.itemNr = itemNr;
         if (input.get() != null) {
-            super.init(input, m_beastObject, itemNr, ExpandOption.FALSE, addButtons);
+            super.init(input, m_beastObject, itemNr, ExpandOption.FALSE, m_bAddButtons);
         } else {
         	pane = new HBox();
         }
         pane.getChildren().add(createComboBox());
+    	pane.setPadding(new Insets(5));
+        FXUtils.createHMCButton(pane, m_beastObject, m_input);
         
         
         
@@ -219,6 +241,12 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
     	}
     	if (param instanceof IntScalar is) {
     		return is.getDomain().getClass();
+    	}
+    	if (param instanceof RealVector rsp) {
+    		return rsp.getDomain().getClass();
+    	}
+    	if (param instanceof IntVector isp) {
+    		return isp.getDomain().getClass();
     	}
         return Scalar.class;
 	}
@@ -326,6 +354,13 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
         // @Override
         synchronized private void paintComponent() {
             TensorDistribution<?,?> distr = (TensorDistribution<?,?>) m_beastObject;
+            if (distr == null || !(distr instanceof ScalarDistribution)) {
+            	try {
+            		distr = (TensorDistribution<?,?>) m_beastObject.getInput("distr").get();
+            	} catch (Throwable t) {
+            		// ignore
+            	}
+            }
             if (distr == null || !(distr instanceof ScalarDistribution)) {
                 drawError();
             } else {
@@ -547,12 +582,12 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
         String text = prior.paramInput.get() != null ? ((BEASTInterface)prior.paramInput.get()).getID() : prior.getID();
 
         int k = 0;
-        ScalarDistribution<?,?> distr = (ScalarDistribution<?,?>) (
-        		(prior instanceof ScalarDistribution<?,?>) ?
-        				m_beastObject :
-        					m_beastObject.getInput("distr").get());//m_input.get());
-        Object param = distr.paramInput.get();
-        Class<?> domain = getParameterDomain(param);
+//        ScalarDistribution<?,?> distr = (ScalarDistribution<?,?>) (
+//        		(prior instanceof ScalarDistribution<?,?>) ?
+//        				m_beastObject :
+//        				m_beastObject.getInput("distr").get());
+        // Object param = distr.paramInput.get();
+        Class<?> domain = getParameterDomain(m_beastObject.getInput("param").get());
         for (BeautiSubTemplate template : scalarTemplates) {
         	if (isCompatible(domain, templateDomains.get(k++))) {
         		comboBox.getItems().add(template);
@@ -759,7 +794,9 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
     @Override
 	public void setExpandBox(VBox expandBox) {
 		this.expandBox = expandBox;
-		
+
+		removeBorder(expandBox);
+
 		VBox vbox = FXUtils.newVBox();
 		vbox.getChildren().addAll(expandBox.getChildren());
 		HBox hbox = FXUtils.newHBox();
@@ -768,6 +805,8 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
 		
 		expandBox.getChildren().clear();
 		expandBox.getChildren().add(hbox);
+
+		vbox.setBorder(new Border(new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
 
 		for (Node node : vbox.getChildren()) {
 			if (node instanceof InputEditor ie) {
@@ -783,6 +822,22 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
 				parent.getChildren().set(i, comboBox);
 			}
      });
+	}
+
+    private void removeBorder(Node node) {
+		if (node instanceof VBox vb) {
+			vb.setBorder(new Border(new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0))));
+			for (Node n : vb.getChildren()) {
+				removeBorder(n);
+			}
+		} else if (node instanceof HBox hb) {
+			hb.setBorder(new Border(new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0))));
+			for (Node n : hb.getChildren()) {
+				removeBorder(n);
+			}
+		} else if (node instanceof ScalarDistributionInputEditor sc) {
+			removeBorder(sc.pane);
+		}
 	}
 
 	

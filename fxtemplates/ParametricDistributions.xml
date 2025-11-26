@@ -76,7 +76,7 @@
         <subtemplate id='Gamma' class='beast.base.spec.inference.distribution.Gamma' mainid='[top]'
         	suppressInputs='beast.base.spec.inference.distribution.Gamma.beta,beast.base.spec.inference.distribution.Gamma.param'
             hmc='
-			Gamma/beta/=ParametricDistributions/Gamma/beta/,
+			Gamma/theta/=ParametricDistributions/Gamma/beta/,
 			Gamma/alpha/=ParametricDistributions/Gamma/alpha/,
 			Gamma/mode/=ParametricDistributions/Gamma/mode/,
 			Gamma/offset/=ParametricDistributions/Gamma/offset/'>

@@ -69,12 +69,12 @@ public class ScalarInputEditor extends BEASTObjectInputEditor {
     protected void initEntry() {
         if (m_input.get() != null) {
         	if (itemNr < 0) {
-        		Scalar parameter = (Scalar) m_input.get();
+        		Scalar<?,?> parameter = (Scalar<?,?>) m_input.get();
         		String s = "";
         		s += parameter.get() + " ";
         		m_entry.setText(s);
         	} else {
-        		Scalar parameter = (Scalar) ((List<?>)m_input.get()).get(itemNr);
+        		Scalar<?,?> parameter = (Scalar<?,?>) ((List<?>)m_input.get()).get(itemNr);
         		String s = "";
         		s += parameter.get() + " ";
         		m_entry.setText(s);
@@ -86,9 +86,9 @@ public class ScalarInputEditor extends BEASTObjectInputEditor {
     protected void processEntry() {
         try {
             String valueString = m_entry.getText();
-            Scalar parameter = (Scalar) m_input.get();
-        	String oldValue = "";
-    		oldValue += parameter.get() + "";
+            Scalar<?,?> parameter = (Scalar<?,?>) m_input.get();
+        	//String oldValue = "";
+    		//oldValue += parameter.get() + "";
     		
     		if (parameter instanceof RealScalarParam r) {
     			r.set(Double.valueOf(valueString));
@@ -110,11 +110,11 @@ public class ScalarInputEditor extends BEASTObjectInputEditor {
     @Override
     protected void addComboBox(Pane box, Input<?> input, BEASTInterface beastObject) {
         HBox paramBox = FXUtils.newHBox();
-        Scalar parameter = null;
+        Scalar<?,?> parameter = null;
         if (itemNr >= 0) {
-        	parameter = (Scalar) ((List<?>) input.get()).get(itemNr);
+        	parameter = (Scalar<?,?>) ((List<?>) input.get()).get(itemNr);
         } else {
-        	parameter = (Scalar) input.get();
+        	parameter = (Scalar<?,?>) input.get();
         }
 
         if (parameter == null) {
@@ -302,7 +302,7 @@ public class ScalarInputEditor extends BEASTObjectInputEditor {
 
     @Override
     protected void refresh() {
-        Scalar parameter = (Scalar) m_input.get();
+        Scalar<?,?> parameter = (Scalar<?,?>) m_input.get();
 		String s = "";
 		s += parameter.get() + " ";
 		m_entry.setText(s);

@@ -37,6 +37,7 @@
     <mergewith point='treePriorTemplates'>
         <!-- Yule -->
         <subtemplate id='YuleModel' class='beast.base.spec.evolution.speciation.YuleModel' mainid='YuleModel.t:$(n)' hmc='
+YuleModel/birthDiffRate/=Priors/YuleBirthRatePrior/,
 YuleModelUniformOperator/index/=Operators/BactrianNodeOperator/,
 YuleModelSubtreeSlide/index/=Operators/SubtreeSlide/,
 YuleModelNarrow/index/=Operators/Exchange/,
