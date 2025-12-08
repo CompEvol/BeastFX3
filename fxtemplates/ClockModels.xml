@@ -27,7 +27,7 @@
     	            <parameter idref="clockRate.c:$(n)"/>
         	        <tree idref="Tree.t:$(n)"/>
 	        	    <operator idref="AVMNOperator.$(n)"/>
-					<operator id='strictClockUpDownOperatorX.c:$(n)' spec='beast.base.spec.inference.operator.UpDownOperator' scaleFactor="0.75" weight="3">
+					<operator id='strictClockUpDownOperatorX.c:$(n)' spec='beast.base.spec.evolution.operator.UpDownOperator' scaleFactor="0.75" weight="3">
 						<up idref="clockRate.c:$(n)"/>
 						<down idref="Tree.t:$(n)"/>
 					</operator>
@@ -89,7 +89,7 @@
         <operator id='ClockRateScaler.c:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleVectorOperator' scaleAll='false' scaleFactor="0.1" weight="15" parameter="@clockrates.c:$(n)"/>
 
         <operator id='randomClockScaler.c:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.1" weight="1" parameter="@meanClockRate.c:$(n)"/>
-		<operator id='randomClockUpDownOperator.c:$(n)' spec='beast.base.spec.inference.operator.UpDownOperator' scaleFactor="0.1" weight="3">
+		<operator id='randomClockUpDownOperator.c:$(n)' spec='beast.base.spec.evolution.operator.UpDownOperator' scaleFactor="0.1" weight="3">
 			<up idref="meanClockRate.c:$(n)"/>
 			<down idref="Tree.t:$(n)"/>
 		</operator>

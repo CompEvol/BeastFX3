@@ -132,7 +132,7 @@ MutationRatePrior/index/=Priors/MutationRatePrior/
         <operator id="FrequenciesExchanger.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
             <parameter idref="freqParameter.s:$(n)"/>
         	<operator idref="AVMNOperator.$(n)"/>
-	        <operator id='FrequenciesExchangerX.s:$(n)' spec='beast.base.spec.inference.operator.deltaexchange.RealDeltaExchangeOperator' delta="0.01" weight="0.1" parameter="@freqParameter.s:$(n)"/>
+	        <operator id='FrequenciesExchangerX.s:$(n)' spec='beast.base.spec.inference.operator.DeltaExchangeOperator' delta="0.01" weight="0.1" parameter="@freqParameter.s:$(n)"/>
         </operator>
 
 
@@ -141,11 +141,9 @@ MutationRatePrior/index/=Priors/MutationRatePrior/
                 <S spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.25" estimate="false"/>
         </distribution>
 
-        <prior id='FrequenciesPrior.s:$(n)' vector='@freqParameter.s:$(n)' spec="beast.base.spec.inference.distribution.Prior">
-			<distr spec="beast.base.inference.distribution.Dirichlet">
-                <parameter spec="parameter.RealParameter" dimension="4" estimate="false" name="alpha">4.0 4.0 4.0 4.0</parameter>
-            </distr> 
-        </prior>
+		<distribution id='FrequenciesPrior.s:$(n)' param='@freqParameter.s:$(n)' spec="beast.base.spec.inference.distribution.Dirichlet">
+            <alpha spec="beast.base.spec.inference.parameter.RealVectorParam" domain="PositiveReal" estimate="false">4.0 4.0 4.0 4.0</alpha>
+        </distribution> 
 
 ]]>
 
@@ -198,7 +196,7 @@ MutationRatePrior/index/=Priors/MutationRatePrior/
         <operator id="FrequenciesExchanger.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
             <parameter idref="freqParameter.s:$(n)"/>
         	<operator idref="AVMNOperator.$(n)"/>
-	        <operator id='FrequenciesExchangerX.s:$(n)' spec='beast.base.spec.inference.operator.deltaexchange.RealDeltaExchangeOperator' delta="0.01" weight="0.1" parameter="@freqParameter.s:$(n)"/>
+            <operator id='FrequenciesExchangerX.s:$(n)' spec='beast.base.spec.inference.operator.DeltaExchangeOperator' delta="0.01" weight="0.1" parameter="@freqParameter.s:$(n)"/>
         </operator>
 
         <distribution id='kappa1Prior.s:$(n)' spec='beast.base.spec.inference.distribution.LogNormal' param='@kappa1.s:$(n)' >
@@ -211,11 +209,9 @@ MutationRatePrior/index/=Priors/MutationRatePrior/
                 <S spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.25" estimate="false"/>
         </distribution>
 
-    <prior id='FrequenciesPrior.s:$(n)' vector='@freqParameter.s:$(n)' spec="beast.base.spec.inference.distribution.Prior">
-			<distr spec="beast.base.inference.distribution.Dirichlet">
-                <parameter spec="parameter.RealParameter" dimension="4" estimate="false" name="alpha">4.0 4.0 4.0 4.0</parameter>
-            </distr> 
-	</prior>
+        <distribution id='FrequenciesPrior.s:$(n)' param='@freqParameter.s:$(n)' spec="beast.base.spec.inference.distribution.Dirichlet">
+            <alpha spec="beast.base.spec.inference.parameter.RealVectorParam" domain="PositiveReal" estimate="false">4.0 4.0 4.0 4.0</alpha>
+        </distribution> 
 
 ]]>
 
@@ -328,7 +324,7 @@ RateGTPrior/index/=Priors/RateGTRPrior/,
         <operator id="FrequenciesExchanger.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
             <parameter idref="freqParameter.s:$(n)"/>
         	<operator idref="AVMNOperator.$(n)"/>
-	        <operator id='FrequenciesExchangerX.s:$(n)' spec='beast.base.spec.inference.operator.deltaexchange.RealDeltaExchangeOperator' delta="0.01" weight="0.1" parameter="@freqParameter.s:$(n)"/>
+            <operator id='FrequenciesExchangerX.s:$(n)' spec='beast.base.spec.inference.operator.DeltaExchangeOperator' delta="0.01" weight="0.1" parameter="@freqParameter.s:$(n)"/>
         </operator>
 
 
@@ -358,11 +354,9 @@ RateGTPrior/index/=Priors/RateGTRPrior/,
         </distribution>
 
 
-        <prior id='FrequenciesPrior.s:$(n)' vector='@freqParameter.s:$(n)' spec="beast.base.spec.inference.distribution.Prior">
-			<distr spec="beast.base.inference.distribution.Dirichlet">
-                <parameter spec="parameter.RealParameter" dimension="4" estimate="false" name="alpha">4.0 4.0 4.0 4.0</parameter>
-            </distr> 
-		</prior>
+        <distribution id='FrequenciesPrior.s:$(n)' param='@freqParameter.s:$(n)' spec="beast.base.spec.inference.distribution.Dirichlet">
+            <alpha spec="beast.base.spec.inference.parameter.RealVectorParam" domain="PositiveReal" estimate="false">4.0 4.0 4.0 4.0</alpha>
+        </distribution> 
 ]]>
 
             <connect srcID='rateAC.s:$(n)' targetID='state' inputName='stateNode'
@@ -509,8 +503,12 @@ RateGTPrior/index/=Priors/RateGTRPrior/,
 	        <operator id="FrequenciesExchanger.c:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
                 <parameter idref="freqParameter.s:$(n)"/>
     	        <operator idref="AVMNOperator.$(n)"/>
-		        <operator id='FrequenciesExchangerX.s:$(n)' spec='beast.base.spec.inference.operator.deltaexchange.RealDeltaExchangeOperator' delta="0.01" weight="0.1" parameter="@freqParameter.s:$(n)"/>
+                <operator id='FrequenciesExchangerX.s:$(n)' spec='beast.base.spec.inference.operator.DeltaExchangeOperator' delta="0.01" weight="0.1" parameter="@freqParameter.s:$(n)"/>
 	        </operator>
+
+            <distribution id='FrequenciesPrior.s:$(n)' param='@freqParameter.s:$(n)' spec="beast.base.spec.inference.distribution.Dirichlet">
+                <alpha spec="beast.base.spec.inference.parameter.RealVectorParam" domain="PositiveReal" estimate="false">4.0 4.0 4.0 4.0</alpha>
+            </distribution> 
 
  ]]>
             <connect srcID='freqParameter.s:$(n)' targetID='state' inputName='stateNode'

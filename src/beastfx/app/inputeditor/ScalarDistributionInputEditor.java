@@ -589,7 +589,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
         // Object param = distr.paramInput.get();
         Class<?> domain = getParameterDomain(m_beastObject.getInput("param").get());
         for (BeautiSubTemplate template : scalarTemplates) {
-        	if (isCompatible(domain, templateDomains.get(k++))) {
+        	if (isCompatible(domain, templateDomains.get(k++)) || template.getID().equals("BoundedReal")) {
         		comboBox.getItems().add(template);
         	}
         }

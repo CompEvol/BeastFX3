@@ -118,6 +118,23 @@
 ]]>
         </subtemplate>
 
+
+        <!-- Truncated -->
+        <subtemplate id='BoundedReal' class='beast.base.spec.inference.distribution.BoundedReal' mainid='[top]'>
+            <![CDATA[
+        <distr offset="0.0" spec="beast.base.spec.inference.distribution.BoundedReal">
+            <param spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.0" estimate="false"/>
+            <lower spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.0" estimate="false"/>
+            <upper spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="1.0" estimate="false"/>
+            <distribution offset="0.0" spec="beast.base.spec.inference.distribution.Normal">
+                <mean spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.0" estimate="false"/>
+                <sigma spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>
+            </distribution>
+        </distr>
+]]>
+        </subtemplate>
+
+
         <!-- InverseGamma -->
         <subtemplate id='InverseGamma' class='beast.base.spec.inference.distribution.InverseGamma' mainid='[top]'
         	suppressInputs='beast.base.spec.inference.distribution.InverseGamma.param'

@@ -77,6 +77,11 @@ public class BeautiSubTemplate extends BEASTObject {
     @Override
     public void initAndValidate() {
     	try {
+    		if (getID().equals("TruncatedPositiveRealDistribution")) {
+    			int h = 3;
+    			h++;
+    			
+    		}
     		FXUtils.processHMCPages(hmcInput.get());
         _class = BEASTClassLoader.forName(classInput.get());
         shortClassName = classInput.get().substring(classInput.get().lastIndexOf('.') + 1);

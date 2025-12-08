@@ -15,7 +15,7 @@
 			replace tree scale operator with more efficient BICESPS operators.
 			<operator id='$(m)TreeScaler.t:$(n)' spec='BactrianScaleOperator' scaleFactor="0.1" weight="3" tree="@Tree.t:$(n)"/>
 -->                        
-		      <operator id="$(m)TreeScaler.t:$(n)" spec="beast.base.spec.inference.operator.UpDownOperator" up="@Tree.t:$(n)" weight="4.0" scaleFactor="0.1"/>
+		      <operator id="$(m)TreeScaler.t:$(n)" spec="beast.base.spec.evolution.operator.UpDownOperator" up="@Tree.t:$(n)" weight="4.0" scaleFactor="0.1"/>
             <operator id='$(m)TreeRootScaler.t:$(n)' spec='beast.base.evolution.operator.kernel.BactrianScaleOperator' scaleFactor="0.1" weight="3" tree="@Tree.t:$(n)" rootOnly='true'/>
             <operator id='$(m)UniformOperator.t:$(n)' spec='beast.base.evolution.operator.kernel.BactrianNodeOperator' weight="30" tree="@Tree.t:$(n)"/>
             <operator id='$(m)SubtreeSlide.t:$(n)' spec='beast.base.evolution.operator.kernel.BactrianSubtreeSlide' weight="15" size="1.0" tree="@Tree.t:$(n)"/>
@@ -489,7 +489,7 @@ EBSPLogger/mode/
 			<operator id="bitflip.alltrees" parameter="@indicators.alltrees" spec="beast.base.spec.inference.operator.BitFlipOperator" uniform="true" weight="30.0"/>
 			<operator id="indicatorSampler.alltrees" dist="@popPriorDist.EBSP" indicators="@indicators.alltrees" spec="beast.base.spec.inference.operator.SampleOffValues" values="@popSizes.alltrees" weight="15.0"/>
 			<operator id="indicatorScaler.alltrees" degreesOfFreedom="1" indicator="@indicators.alltrees" parameter="@popSizes.alltrees" scaleAll="false" scaleAllIndependently="false" scaleFactor="0.5"  spec='beast.base.spec.inference.operator.scale.ScaleVectorOperator' weight="15.0"/>
-			<operator id="EBSPupDownOperator.alltrees" scaleFactor="0.7" spec='beast.base.spec.inference.operator.UpDownOperator' weight="5.0">
+			<operator id="EBSPupDownOperator.alltrees" scaleFactor="0.7" spec='beast.base.spec.evolution.operator.UpDownOperator' weight="5.0">
 				<up idref="popSizes.alltrees"/>
 				<up idref="populationMean.alltrees"/>
 			</operator>
