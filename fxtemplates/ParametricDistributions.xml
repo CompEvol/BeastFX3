@@ -7,7 +7,7 @@
 
         <!-- Uniform -->
         <subtemplate id='Uniform' class='beast.base.spec.inference.distribution.Uniform' mainid='[top]'
-        	suppressInputs='beast.base.spec.inference.distribution.Uniform.param'
+        	suppressInputs='beast.base.spec.inference.distribution.Uniform.param,beast.base.spec.inference.distribution.Uniform.offset'
             hmc='
             Uniform/GammaShape/=ParametricDistributions/Uniform/GammaShape/,
             Uniform/offset/=ParametricDistributions/Uniform/offset/,
@@ -22,7 +22,7 @@
 
         <!-- Normal -->
         <subtemplate id='Normal' class='beast.base.spec.inference.distribution.Normal' mainid='[top]' 
-        	suppressInputs='beast.base.spec.inference.distribution.Normal.tau,beast.base.spec.inference.distribution.Normal.param'
+        	suppressInputs='beast.base.spec.inference.distribution.Normal.tau,beast.base.spec.inference.distribution.Normal.param,beast.base.spec.inference.distribution.Normal.offset'
             hmc='
 			Normal/mean/=ParametricDistributions/Normal/mean/,
 			Normal/sigma/=ParametricDistributions/Normal/sigma/,
@@ -45,7 +45,7 @@
 
         <!-- lognormal -->
         <subtemplate id='LogNormal' class='beast.base.spec.inference.distribution.LogNormal' mainid='[top]'
-        	suppressInputs='beast.base.spec.inference.distribution.LogNormal.param'
+        	suppressInputs='beast.base.spec.inference.distribution.LogNormal.param,beast.base.spec.inference.distribution.LogNormal.offset'
             hmc='
 			LogNormal/M/=ParametricDistributions/LogNormalDistributionModel/M/,
 			LogNormal/offset/=ParametricDistributions/LogNormalDistributionModel/offset/,
@@ -61,7 +61,7 @@
 
         <!-- Exponential -->
         <subtemplate id='Exponential' class='beast.base.spec.inference.distribution.Exponential' mainid='[top]'
-        	suppressInputs='beast.base.spec.inference.distribution.Exponential.param'
+        	suppressInputs='beast.base.spec.inference.distribution.Exponential.param,beast.base.spec.inference.distribution.Exponential.offset'
             hmc='
             Exponential/mean/=ParametricDistributions/Exponential/mean/,
             Exponential/offset/=ParametricDistributions/Exponential/offset/'>
@@ -74,7 +74,7 @@
 
         <!-- Gamma -->
         <subtemplate id='Gamma' class='beast.base.spec.inference.distribution.Gamma' mainid='[top]'
-        	suppressInputs='beast.base.spec.inference.distribution.Gamma.beta,beast.base.spec.inference.distribution.Gamma.param'
+        	suppressInputs='beast.base.spec.inference.distribution.Gamma.beta,beast.base.spec.inference.distribution.Gamma.param,beast.base.spec.inference.distribution.Gamma.offset'
             hmc='
 			Gamma/theta/=ParametricDistributions/Gamma/beta/,
 			Gamma/alpha/=ParametricDistributions/Gamma/alpha/,
@@ -90,7 +90,7 @@
 
         <!-- Beta -->
         <subtemplate id='Beta' class='beast.base.spec.inference.distribution.Beta' mainid='[top]'
-        	suppressInputs='beast.base.spec.inference.distribution.Beta.param'
+        	suppressInputs='beast.base.spec.inference.distribution.Beta.param,beast.base.spec.inference.distribution.Beta.offset'
             hmc='
 			Beta/beta/=ParametricDistributions/Beta/beta/,
 			Beta/alpha/=ParametricDistributions/Beta/alpha/,
@@ -104,8 +104,8 @@
         </subtemplate>
 
         <!-- Laplace -->
-        <subtemplate id='LaplaceDistribution' class='beast.base.spec.inference.distribution.Laplace' mainid='[top]'
-        	suppressInputs='beast.base.spec.inference.distribution.Laplace.param'
+        <subtemplate id='Laplace' class='beast.base.spec.inference.distribution.Laplace' mainid='[top]'
+        	suppressInputs='beast.base.spec.inference.distribution.Laplace.param,beast.base.spec.inference.distribution.Laplace.offset'
             hmc='
 			Laplace/lambda/=ParametricDistributions/LaplaceDistribution/lambda//mu/,
 			Laplace/offset/=ParametricDistributions/LaplaceDistribution/offset/,
@@ -120,9 +120,11 @@
 
 
         <!-- Truncated -->
-        <subtemplate id='BoundedReal' class='beast.base.spec.inference.distribution.BoundedReal' mainid='[top]'>
+        <subtemplate id='BoundedReal' class='beast.base.spec.inference.distribution.TruncatedRealDistribution' mainid='[top]'
+        	suppressInputs='beast.base.spec.inference.distribution.TruncatedRealDistribution.param,
+        	beast.base.spec.inference.distribution.TruncatedRealDistribution.offset'>
             <![CDATA[
-        <distr offset="0.0" spec="beast.base.spec.inference.distribution.BoundedReal">
+        <distr offset="0.0" spec="beast.base.spec.inference.distribution.TruncatedRealDistribution">
             <param spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.0" estimate="false"/>
             <lower spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.0" estimate="false"/>
             <upper spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="1.0" estimate="false"/>
@@ -137,7 +139,7 @@
 
         <!-- InverseGamma -->
         <subtemplate id='InverseGamma' class='beast.base.spec.inference.distribution.InverseGamma' mainid='[top]'
-        	suppressInputs='beast.base.spec.inference.distribution.InverseGamma.param'
+        	suppressInputs='beast.base.spec.inference.distribution.InverseGamma.param,beast.base.spec.inference.distribution.InverseGamma.offset'
             hmc='
 			InverseGamma/beta/=ParametricDistributions/InverseGamma/beta/,
 			InverseGamma/alpha/=ParametricDistributions/InverseGamma/alpha/,
@@ -152,7 +154,7 @@
 
         <!-- Poisson -->
         <subtemplate id='Poisson' class='beast.base.spec.inference.distribution.Poisson' mainid='[top]'
-        	suppressInputs='beast.base.spec.inference.distribution.Poisson.param'
+        	suppressInputs='beast.base.spec.inference.distribution.Poisson.param,beast.base.spec.inference.distribution.Poisson.offset'
             hmc='
             Poisson/lambda/=ParametricDistributions/Poisson/lambda/,
             Poisson/offset/=ParametricDistributions/Poisson/offset/'>
@@ -177,7 +179,7 @@
 
         <!-- IID -->
         <subtemplate id='IID' class='beast.base.spec.inference.distribution.IID' mainid='[top]'
-        	suppressInputs='beast.base.spec.inference.distribution.IID.param'
+        	suppressInputs='beast.base.spec.inference.distribution.IID.param,beast.base.spec.inference.distribution.IID.offset'
             hmc='
             IID/alpha/=ParametricDistributions/IID/mean/,
             IID/offset/=ParametricDistributions/IID/offset/'>

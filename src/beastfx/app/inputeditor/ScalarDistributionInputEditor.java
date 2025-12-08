@@ -15,6 +15,7 @@ import java.util.List;
 import org.apache.commons.math.MathException;
 
 import beast.base.core.BEASTInterface;
+import beast.base.core.BEASTObject;
 import beast.base.core.Input;
 import beast.base.core.Log;
 import beast.base.inference.Distribution;
@@ -28,6 +29,7 @@ import beast.base.spec.domain.PositiveReal;
 import beast.base.spec.domain.Real;
 import beast.base.spec.inference.distribution.ScalarDistribution;
 import beast.base.spec.inference.distribution.TensorDistribution;
+import beast.base.spec.inference.distribution.TruncatedRealDistribution;
 import beast.base.spec.inference.parameter.BoolScalarParam;
 import beast.base.spec.inference.parameter.IntScalarParam;
 import beast.base.spec.inference.parameter.RealScalarParam;
@@ -56,6 +58,7 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -136,7 +139,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
         } else {
         	pane = new HBox();
         }
-        pane.getChildren().add(createComboBox());
+        pane.getChildren().add(createComboBox(m_beastObject, m_input));
     	pane.setPadding(new Insets(5));
         FXUtils.createHMCButton(pane, m_beastObject, m_input);
         
@@ -248,7 +251,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
     	if (param instanceof IntVector isp) {
     		return isp.getDomain().getClass();
     	}
-        return Scalar.class;
+        return Real.class;
 	}
 
 	String paramToString(RealScalar<?> p) {
@@ -285,7 +288,8 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
         	super.addComboBox(box, input, beastObject0);
         }
     }
-
+	
+	
     @Override
     /** suppress input label**/
     protected void addInputLabel() {
@@ -566,6 +570,9 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
     @Override
     public void validateInput() {
     	if (graphPanel != null) {
+    		if (m_beastObject instanceof TruncatedRealDistribution trd) {
+    			trd.distributionInput.get().refresh();
+    		}
     		graphPanel.paintComponent();
     	}
 		super.validateInput();
@@ -574,7 +581,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
     
 	private ComboBox<BeautiSubTemplate> comboBox;
 
-	protected ComboBox<BeautiSubTemplate> createComboBox() {
+	protected ComboBox<BeautiSubTemplate> createComboBox(BEASTInterface m_beastObject, Input m_input) {
 		ComboBox<BeautiSubTemplate> comboBox = new ComboBox<>();
 
         TensorDistribution<?,?> prior = (TensorDistribution<?,?>) m_beastObject;
@@ -586,11 +593,13 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
 //        		(prior instanceof ScalarDistribution<?,?>) ?
 //        				m_beastObject :
 //        				m_beastObject.getInput("distr").get());
-        // Object param = distr.paramInput.get();
-        Class<?> domain = getParameterDomain(m_beastObject.getInput("param").get());
+        Object param = m_beastObject.getInput("param").get();
+        Class<?> domain = getParameterDomain(param);
         for (BeautiSubTemplate template : scalarTemplates) {
-        	if (isCompatible(domain, templateDomains.get(k++)) || template.getID().equals("BoundedReal")) {
-        		comboBox.getItems().add(template);
+        	if (isCompatible(domain, templateDomains.get(k++)) || (param != null && template.getID().equals("BoundedReal"))) {
+        		if (!template.getID().equals("BoundedReal") || param != null) {
+        			comboBox.getItems().add(template);
+        		}
         	}
         }
         
@@ -795,6 +804,27 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
 	public void setExpandBox(VBox expandBox) {
 		this.expandBox = expandBox;
 
+		if (m_beastObject instanceof TruncatedRealDistribution td) {
+			expandBox.getChildren().set(0, createComboBox(td.distributionInput.get(), td.distributionInput));
+			
+	        List<InputEditor> editors = doc.getInputEditorFactory().addInputs(expandBox, td.distributionInput.get(), this, null, doc);
+	        
+	        // move editors to the front
+	        expandBox.getChildren().removeAll(editors);
+	        
+	        for (int i = editors.size() - 1; i >= 0; i--) {
+	        	InputEditor e = editors.get(i);
+	        	expandBox.getChildren().add(1, e.getComponent());
+	        }
+			for (InputEditor editor : editors) {
+				editor.addValidationListener(this);
+			}
+
+	        
+		} else {
+	
+		}
+
 		removeBorder(expandBox);
 
 		VBox vbox = FXUtils.newVBox();
@@ -818,7 +848,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
 			if (comboBox != null) {
 				Pane parent = (Pane) comboBox.getParent();
 				int i = parent.getChildren().indexOf(comboBox);
-				comboBox = createComboBox();
+				comboBox = createComboBox(m_beastObject, m_input);
 				parent.getChildren().set(i, comboBox);
 			}
      });

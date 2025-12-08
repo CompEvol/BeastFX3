@@ -99,7 +99,7 @@ public class IIDInputEditor extends ScalarDistributionInputEditor {
             //super.init(input, beastObject, itemNr, ExpandOption.FALSE, addButtons);
         pane.getChildren().add(createComboBox());
         FXUtils.createHMCButton(pane, m_beastObject, m_input);
-        pane.getChildren().add(super.createComboBox());
+        pane.getChildren().add(super.createComboBox(m_beastObject, m_input));
     	pane.setPadding(new Insets(5));
         getChildren().add(pane);
  
