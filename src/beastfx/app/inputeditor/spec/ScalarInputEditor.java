@@ -91,13 +91,13 @@ public class ScalarInputEditor extends BEASTObjectInputEditor {
     		//oldValue += parameter.get() + "";
     		
     		if (parameter instanceof RealScalarParam r) {
-    			r.set(Double.valueOf(valueString));
+    			r.set(Double.valueOf(valueString.trim()));
     			r.valuesInput.set(r.get());
     		} else if (parameter instanceof IntScalarParam i) {
-    			i.set(Integer.valueOf(valueString));
+    			i.set(Integer.valueOf(valueString.trim()));
     			i.valuesInput.set(i.get());
     		} else if (parameter instanceof BoolScalarParam b) {
-    			b.set(Boolean.valueOf(valueString));
+    			b.set(Boolean.valueOf(valueString.trim()));
     			b.valuesInput.set(b.get());
     		}
             validateInput();

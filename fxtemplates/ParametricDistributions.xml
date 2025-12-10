@@ -28,7 +28,7 @@
 			Normal/sigma/=ParametricDistributions/Normal/sigma/,
 			Normal/offset/=ParametricDistributions/Normal/offset/'>
             <![CDATA[
-    <distr offset="0.0" spec="beast.base.spec.inference.distribution.Normal">
+    <distr spec="beast.base.spec.inference.distribution.Normal">
         <mean spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.0" estimate="false"/>
         <sigma spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>
     </distr>
@@ -81,7 +81,7 @@
 			Gamma/mode/=ParametricDistributions/Gamma/mode/,
 			Gamma/offset/=ParametricDistributions/Gamma/offset/'>
             <![CDATA[
-        <distr offset="0.0" spec="beast.base.spec.inference.distribution.Gamma">
+        <distr spec="beast.base.spec.inference.distribution.Gamma">
                 <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="2.0" estimate="false"/>
                 <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="2.0" estimate="false"/>
         </distr>
@@ -96,7 +96,7 @@
 			Beta/alpha/=ParametricDistributions/Beta/alpha/,
 				Beta/offset/=ParametricDistributions/Beta/offset/'>
             <![CDATA[
-        <distr offset="0.0" spec="beast.base.spec.inference.distribution.Beta">
+        <distr spec="beast.base.spec.inference.distribution.Beta">
                 <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="2.0" estimate="false"/>
                 <beta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="2.0" estimate="false"/>
         </distr>
@@ -111,7 +111,7 @@
 			Laplace/offset/=ParametricDistributions/LaplaceDistribution/offset/,
 			Laplace/scale/=ParametricDistributions/LaplaceDistribution/scale/'>
             <![CDATA[
-        <distr offset="0.0" spec="beast.base.spec.inference.distribution.Laplace">
+        <distr spec="beast.base.spec.inference.distribution.Laplace">
                 <mu spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.0" estimate="false"/>
                 <scale spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>
         </distr>
@@ -119,16 +119,47 @@
         </subtemplate>
 
 
-        <!-- Truncated -->
+        <!-- Truncated Real -->
         <subtemplate id='BoundedReal' class='beast.base.spec.inference.distribution.TruncatedRealDistribution' mainid='[top]'
         	suppressInputs='beast.base.spec.inference.distribution.TruncatedRealDistribution.param,
         	beast.base.spec.inference.distribution.TruncatedRealDistribution.offset'>
             <![CDATA[
-        <distr offset="0.0" spec="beast.base.spec.inference.distribution.TruncatedRealDistribution">
+        <distr spec="beast.base.spec.inference.distribution.TruncatedRealDistribution">
             <param spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.0" estimate="false"/>
             <lower spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.0" estimate="false"/>
             <upper spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="1.0" estimate="false"/>
-            <distribution offset="0.0" spec="beast.base.spec.inference.distribution.Normal">
+            <distribution spec="beast.base.spec.inference.distribution.Normal">
+                <mean spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.0" estimate="false"/>
+                <sigma spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>
+            </distribution>
+        </distr>
+]]>
+        </subtemplate>
+
+        <!-- Truncated Int -->
+        <subtemplate id='BoundedInt' class='beast.base.spec.inference.distribution.TruncatedIntDistribution' mainid='[top]'
+        	suppressInputs='beast.base.spec.inference.distribution.TruncatedIntDistribution.param,
+        	beast.base.spec.inference.distribution.TruncatedIntDistribution.offset'>
+            <![CDATA[
+        <distr spec="beast.base.spec.inference.distribution.TruncatedIntDistribution">
+            <param spec="beast.base.spec.inference.parameter.IntScalarParam" domain="Int" value="0" estimate="false"/>
+            <lower spec="beast.base.spec.inference.parameter.IntScalarParam" domain="Int" value="0" estimate="false"/>
+            <upper spec="beast.base.spec.inference.parameter.IntScalarParam" domain="Int" value="1" estimate="false"/>
+            <distribution spec="beast.base.spec.inference.distribution.Poisson">
+	            <lambda spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="0.693" estimate="false"/>
+            </distribution>
+        </distr>
+]]>
+        </subtemplate>
+        
+        <!-- Offset -->
+        <subtemplate id='Offset' class='beast.base.spec.inference.distribution.OffsetRealDistribution' mainid='[top]'
+        	suppressInputs='beast.base.spec.inference.distribution.OffsetRealDistribution.param'>
+            <![CDATA[
+        <distr spec="beast.base.spec.inference.distribution.OffsetRealDistribution">
+            <param spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.0" estimate="false"/>
+            <offset spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.0" estimate="false"/>
+            <distribution spec="beast.base.spec.inference.distribution.Normal">
                 <mean spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.0" estimate="false"/>
                 <sigma spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>
             </distribution>
@@ -145,7 +176,7 @@
 			InverseGamma/alpha/=ParametricDistributions/InverseGamma/alpha/,
 			InverseGamma/offset/=ParametricDistributions/InverseGamma/offset/'>
             <![CDATA[
-        <distr offset="0.0" spec="beast.base.spec.inference.distribution.InverseGamma">
+        <distr spec="beast.base.spec.inference.distribution.InverseGamma">
                 <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="2.0" estimate="false"/>
                 <beta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="2.0" estimate="false"/>
         </distr>
@@ -159,7 +190,7 @@
             Poisson/lambda/=ParametricDistributions/Poisson/lambda/,
             Poisson/offset/=ParametricDistributions/Poisson/offset/'>
             <![CDATA[
-		<distr spec='beast.base.spec.inference.distribution.Poisson' offset="0.0">
+		<distr spec='beast.base.spec.inference.distribution.Poisson'>
             <lambda spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="0.693" estimate="false"/>
 		</distr>
 ]]>
@@ -171,7 +202,7 @@
             Dirichlet/alpha/=ParametricDistributions/Dirichlet/mean/,
             Dirichlet/offset/=ParametricDistributions/Dirichlet/offset/'>
             <![CDATA[
-			<distr spec="beast.base.inference.distribution.Dirichlet" offset="0.0">
+			<distr spec="beast.base.inference.distribution.Dirichlet">
                 <parameter spec="parameter.RealParameter" estimate="false" name="alpha">1.0</parameter>
             </distr> 
 ]]>

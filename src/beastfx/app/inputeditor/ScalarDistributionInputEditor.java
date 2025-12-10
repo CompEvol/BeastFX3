@@ -15,7 +15,6 @@ import java.util.List;
 import org.apache.commons.math.MathException;
 
 import beast.base.core.BEASTInterface;
-import beast.base.core.BEASTObject;
 import beast.base.core.Input;
 import beast.base.core.Log;
 import beast.base.inference.Distribution;
@@ -27,8 +26,10 @@ import beast.base.spec.domain.NonNegativeReal;
 import beast.base.spec.domain.PositiveInt;
 import beast.base.spec.domain.PositiveReal;
 import beast.base.spec.domain.Real;
+import beast.base.spec.inference.distribution.OffsetRealDistribution;
 import beast.base.spec.inference.distribution.ScalarDistribution;
 import beast.base.spec.inference.distribution.TensorDistribution;
+import beast.base.spec.inference.distribution.TruncatedIntDistribution;
 import beast.base.spec.inference.distribution.TruncatedRealDistribution;
 import beast.base.spec.inference.parameter.BoolScalarParam;
 import beast.base.spec.inference.parameter.IntScalarParam;
@@ -37,7 +38,6 @@ import beast.base.spec.type.IntScalar;
 import beast.base.spec.type.IntVector;
 import beast.base.spec.type.RealScalar;
 import beast.base.spec.type.RealVector;
-import beast.base.spec.type.Scalar;
 import beastfx.app.util.FXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -58,7 +58,6 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -251,6 +250,19 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
     	if (param instanceof IntVector isp) {
     		return isp.getDomain().getClass();
     	}
+    	if (param == null) {
+    		// check the parent distribution
+    		for (Object o : m_beastObject.getOutputs()) {
+    			if (o instanceof ScalarDistribution sd) {
+    				Class<?> class_ = getParameterDomain(sd.paramInput.get());
+    				if (Real.class.isAssignableFrom(class_)) {
+    					return Real.class;
+    				} else {
+    					return Int.class;
+    				}
+    			}
+    		}
+    	}
         return Real.class;
 	}
 
@@ -432,15 +444,15 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
             if (!m_distr.isIntegerDistribution()) {
                 points = POINTS;
             } else {
-                points = (int) (xRange);
+                points = (int) (xRange+1);
             }
             double[] xPoints = new double[points];
             double[] fyPoints = new double[points];
             double yMax = 0;
             
             for (int i = 0; i < points; i++) {
-            	xPoints[i] = minValue + (xRange * i) / points;
-            	double y0 = minValue + (xRange * i) / points;
+            	xPoints[i] = minValue + (xRange * i) / (points-1);
+            	double y0 = minValue + (xRange * i) / (points-1);
             	if (param != null && (y0 < lowerParam || y0 > upperParam)) {
             		fyPoints[i] = 0;
             	} else {
@@ -572,6 +584,10 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
     	if (graphPanel != null) {
     		if (m_beastObject instanceof TruncatedRealDistribution trd) {
     			trd.distributionInput.get().refresh();
+    		} else if (m_beastObject instanceof TruncatedIntDistribution tid) {
+    			tid.distributionInput.get().refresh();
+    		} else if (m_beastObject instanceof OffsetRealDistribution ord) {
+    			ord.distributionInput.get().refresh();
     		}
     		graphPanel.paintComponent();
     	}
@@ -581,7 +597,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
     
 	private ComboBox<BeautiSubTemplate> comboBox;
 
-	protected ComboBox<BeautiSubTemplate> createComboBox(BEASTInterface m_beastObject, Input m_input) {
+	protected ComboBox<BeautiSubTemplate> createComboBox(BEASTInterface m_beastObject, Input<?> m_input) {
 		ComboBox<BeautiSubTemplate> comboBox = new ComboBox<>();
 
         TensorDistribution<?,?> prior = (TensorDistribution<?,?>) m_beastObject;
@@ -595,9 +611,15 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
 //        				m_beastObject.getInput("distr").get());
         Object param = m_beastObject.getInput("param").get();
         Class<?> domain = getParameterDomain(param);
+        boolean isReal = Real.class.isAssignableFrom(domain);
         for (BeautiSubTemplate template : scalarTemplates) {
-        	if (isCompatible(domain, templateDomains.get(k++)) || (param != null && template.getID().equals("BoundedReal"))) {
-        		if (!template.getID().equals("BoundedReal") || param != null) {
+        	if (isCompatible(domain, templateDomains.get(k++)) || 
+        		(param != null && 
+        			(template.getID().equals("BoundedReal") && isReal ||
+        			 template.getID().equals("BoundedInt") && !isReal ||
+        			 template.getID().equals("Offset")))) {
+        		if (!((template.getID().equals("BoundedReal") && isReal || template.getID().equals("BoundedInt") && !isReal) 
+        				|| template.getID().equals("Offset")) || param != null) {
         			comboBox.getItems().add(template);
         		}
         	}
@@ -809,20 +831,19 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
 			
 	        List<InputEditor> editors = doc.getInputEditorFactory().addInputs(expandBox, td.distributionInput.get(), this, null, doc);
 	        
-	        // move editors to the front
-	        expandBox.getChildren().removeAll(editors);
+	        processVbox(editors);
+		} else if (m_beastObject instanceof TruncatedIntDistribution td) {
+			expandBox.getChildren().set(0, createComboBox(td.distributionInput.get(), td.distributionInput));
+			
+	        List<InputEditor> editors = doc.getInputEditorFactory().addInputs(expandBox, td.distributionInput.get(), this, null, doc);
 	        
-	        for (int i = editors.size() - 1; i >= 0; i--) {
-	        	InputEditor e = editors.get(i);
-	        	expandBox.getChildren().add(1, e.getComponent());
-	        }
-			for (InputEditor editor : editors) {
-				editor.addValidationListener(this);
-			}
-
+	        processVbox(editors);
+		} else if (m_beastObject instanceof OffsetRealDistribution od) {
+			expandBox.getChildren().set(0, createComboBox(od.distributionInput.get(), od.distributionInput));
+			
+	        List<InputEditor> editors = doc.getInputEditorFactory().addInputs(expandBox, od.distributionInput.get(), this, null, doc);
 	        
-		} else {
-	
+	        processVbox(editors);
 		}
 
 		removeBorder(expandBox);
@@ -854,7 +875,20 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
      });
 	}
 
-    private void removeBorder(Node node) {
+    private void processVbox(List<InputEditor> editors) {
+        // move editors in list to the front of the expandBox
+        expandBox.getChildren().removeAll(editors);
+        
+        for (int i = editors.size() - 1; i >= 0; i--) {
+        	InputEditor e = editors.get(i);
+        	expandBox.getChildren().add(1, e.getComponent());
+        }
+//		for (InputEditor editor : editors) {
+//			editor.addValidationListener(this);
+//		}
+	}
+    
+	private void removeBorder(Node node) {
 		if (node instanceof VBox vb) {
 			vb.setBorder(new Border(new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0))));
 			for (Node n : vb.getChildren()) {

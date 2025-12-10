@@ -62,19 +62,19 @@ MutationRatePrior/index/=Priors/MutationRatePrior/
             <operator id="proportionInvariantScaler.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
                 <parameter idref="proportionInvariant.s:$(n)"/>
                 <operator idref="AVMNOperator.$(n)"/>
-                <operator id='proportionInvariantScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@proportionInvariant.s:$(n)"/>
+                <operator id='proportionInvariantScalerX.s:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@proportionInvariant.s:$(n)"/>
             </operator>
 
             <operator id="mutationRateScaler.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
                 <parameter idref="mutationRate.s:$(n)"/>
                 <operator idref="AVMNOperator.$(n)"/>
-                <operator id='mutationRateScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@mutationRate.s:$(n)"/>
+                <operator id='mutationRateScalerX.s:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@mutationRate.s:$(n)"/>
             </operator>
 
             <operator id="gammaShapeScaler.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
                 <parameter idref="gammaShape.s:$(n)"/>
                 <operator idref="AVMNOperator.$(n)"/>
-               <operator id='gammaShapeScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@gammaShape.s:$(n)"/>
+               <operator id='gammaShapeScalerX.s:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@gammaShape.s:$(n)"/>
             </operator>
             ]]>
 
@@ -126,7 +126,7 @@ MutationRatePrior/index/=Priors/MutationRatePrior/
         <operator id="KappaScaler.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
             <parameter idref="kappa.s:$(n)"/>
         	<operator idref="AVMNOperator.$(n)"/>
-		    <operator id='KappaScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.1" weight="0.1" parameter="@kappa.s:$(n)"/>
+		    <operator id='KappaScalerX.s:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.1" weight="0.1" parameter="@kappa.s:$(n)"/>
         </operator>
 
         <operator id="FrequenciesExchanger.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
@@ -184,13 +184,13 @@ MutationRatePrior/index/=Priors/MutationRatePrior/
         <operator id="kappa1Scaler.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
             <parameter idref="kappa1.s:$(n)"/>
         	<operator idref="AVMNOperator.$(n)"/>
-	        <operator id='kappa1ScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@kappa1.s:$(n)"/>
+	        <operator id='kappa1ScalerX.s:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@kappa1.s:$(n)"/>
         </operator>
 
         <operator id="kappa2Scaler.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
             <parameter idref="kappa2.s:$(n)"/>
         	<operator idref="AVMNOperator.$(n)"/>
-	        <operator id='kappa2ScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@kappa2.s:$(n)"/>
+	        <operator id='kappa2ScalerX.s:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@kappa2.s:$(n)"/>
         </operator>
 
         <operator id="FrequenciesExchanger.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
@@ -288,37 +288,37 @@ RateGTPrior/index/=Priors/RateGTRPrior/,
         <operator id="RateACScaler.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
             <parameter idref="rateAC.s:$(n)"/>
         	<operator idref="AVMNOperator.$(n)"/>
-	        <operator id='RateACScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@rateAC.s:$(n)"/>
+	        <operator id='RateACScalerX.s:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@rateAC.s:$(n)"/>
         </operator>
 
         <operator id="RateAGScaler.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
             <parameter idref="rateAG.s:$(n)"/>
         	<operator idref="AVMNOperator.$(n)"/>
-	        <operator id='RateAGScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@rateAG.s:$(n)"/>
+	        <operator id='RateAGScalerX.s:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@rateAG.s:$(n)"/>
         </operator>
 
         <operator id="RateATScaler.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
             <parameter idref="rateAT.s:$(n)"/>
         	<operator idref="AVMNOperator.$(n)"/>
-	        <operator id='RateATScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@rateAT.s:$(n)"/>
+	        <operator id='RateATScalerX.s:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@rateAT.s:$(n)"/>
         </operator>
 
         <operator id="RateCGScaler.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
             <parameter idref="rateCG.s:$(n)"/>
         	<operator idref="AVMNOperator.$(n)"/>
-	        <operator id='RateCGScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@rateCG.s:$(n)"/>
+	        <operator id='RateCGScalerX.s:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@rateCG.s:$(n)"/>
         </operator>
 
         <operator id="RateCTScaler.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
             <parameter idref="rateCT.s:$(n)"/>
         	<operator idref="AVMNOperator.$(n)"/>
-	        <operator id='RateCTScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@rateCT.s:$(n)"/>
+	        <operator id='RateCTScalerX.s:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@rateCT.s:$(n)"/>
         </operator>
 
         <operator id="RateGTScaler.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
             <parameter idref="rateGT.s:$(n)"/>
         	<operator idref="AVMNOperator.$(n)"/>
-	        <operator id='RateGTScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@rateGT.s:$(n)"/>
+	        <operator id='RateGTScalerX.s:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@rateGT.s:$(n)"/>
         </operator>
 
         <operator id="FrequenciesExchanger.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">

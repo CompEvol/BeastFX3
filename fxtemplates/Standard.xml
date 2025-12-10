@@ -325,7 +325,7 @@ ClusterTree/clusterType/,
                 <beta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>
             </distribution>
 
-            <scale id='YuleBirthRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@birthRate.t:$(n)"/>
+            <scale id='YuleBirthRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.75" weight="3" parameter="@birthRate.t:$(n)"/>
 
 
 
@@ -350,7 +350,7 @@ ClusterTree/clusterType/,
 	        <operator id="StrictClockRateScaler.c:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="1.5">
                 <parameter idref="clockRate.c:$(n)"/>
     	        <operator idref="AVMNOperator.$(n)"/>
-		        <operator id='StrictClockRateScalerX.c:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.1" weight="0.1" parameter="@clockRate.c:$(n)"/>
+		        <operator id='StrictClockRateScalerX.c:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.1" weight="0.1" parameter="@clockRate.c:$(n)"/>
 	        </operator>
 
         	<operator id="strictClockUpDownOperator.c:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="1.5">
@@ -366,19 +366,19 @@ ClusterTree/clusterType/,
         	<operator id="proportionInvariantScaler.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
                 <parameter idref="proportionInvariant.s:$(n)"/>
             	<operator idref="AVMNOperator.$(n)"/>
-                <operator id='proportionInvariantScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@proportionInvariant.s:$(n)"/>
+                <operator id='proportionInvariantScalerX.s:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@proportionInvariant.s:$(n)"/>
         	</operator>
 
         	<operator id="mutationRateScaler.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
                 <parameter idref="mutationRate.s:$(n)"/>
             	<operator idref="AVMNOperator.$(n)"/>
-                <operator id='mutationRateScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@mutationRate.s:$(n)"/>
+                <operator id='mutationRateScalerX.s:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@mutationRate.s:$(n)"/>
         	</operator>
 
         	<operator id="gammaShapeScaler.s:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="0.05">
                 <parameter idref="gammaShape.s:$(n)"/>
             	<operator idref="AVMNOperator.$(n)"/>
-               <operator id='gammaShapeScalerX.s:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.5" weight="0.1" parameter="@gammaShape.s:$(n)"/>
+               <operator id='gammaShapeScalerX.s:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@gammaShape.s:$(n)"/>
         	</operator>
 
 

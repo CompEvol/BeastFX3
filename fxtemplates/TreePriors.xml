@@ -60,7 +60,7 @@ YuleBirthRatePrior/index/=Priors/YuleBirthRatePrior/
                 <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="100.0" estimate="false"/>
             </distribution>
 
-  		      <scale id='YuleBirthRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@birthRate.t:$(n)"/>
+  		      <scale id='YuleBirthRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.75" weight="3" parameter="@birthRate.t:$(n)"/>
 ]]>
 			<plate fragment="TreeOperators" var="m" range="YuleModel"/>
 
@@ -115,7 +115,7 @@ CalibratedYuleBirthRatePrior/index/=Priors/CalibratedYuleBirthRatePrior/
                 <theta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="100.0" estimate="false"/>
             </distribution>
 
-  		    <scale id='CalibratedYuleBirthRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@birthRateY.t:$(n)"/>
+  		    <scale id='CalibratedYuleBirthRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.75" weight="3" parameter="@birthRateY.t:$(n)"/>
 ]]>
 			<plate fragment="TreeOperators" var="m" range="CalibratedYuleModel"/>
 
@@ -176,8 +176,8 @@ DeathRatePrior/index/=Priors/DeathRatePrior/'>
                 <beta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>
             </distribution>
 
-  		    <scale id='BirthRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@BDBirthRate.t:$(n)"/>
-  		    <scale id='DeathRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@BDDeathRate.t:$(n)"/>
+  		    <scale id='BirthRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.75" weight="3" parameter="@BDBirthRate.t:$(n)"/>
+  		    <scale id='DeathRateScaler.t:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.75" weight="3" parameter="@BDDeathRate.t:$(n)"/>
 ]]>
 			<plate fragment="TreeOperators" var="m" range="BirthDeath"/>
 
@@ -241,7 +241,7 @@ PopSizeScaler/index/=Operators/BactrianRateScaler/index/'>
                  </populationModel>
             </distribution>
 
-  		    <operator id='PopSizeScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' 
+  		    <operator id='PopSizeScaler.t:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' 
   		    	scaleFactor="0.75" weight="3" parameter="@popSize.t:$(n)"/>
   		    	
             <distribution id='PopSizePrior.t:$(n)' spec='beast.base.spec.inference.distribution.Gamma' param='@popSize.t:$(n)' >
@@ -300,7 +300,7 @@ GrowthRateRandomWalk/index/=Operators/BactrianRandomWalk'>
                 </populationModel>
             </distribution>
 
-  		    <operator id='ePopSizeScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleScalarOperator' scaleFactor="0.75" weight="3" parameter="@ePopSize.t:$(n)"/>
+  		    <operator id='ePopSizeScaler.t:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.75" weight="3" parameter="@ePopSize.t:$(n)"/>
 	        
 	        <operator id="GrowthRateRandomWalk.t:$(n)" spec="beast.base.spec.inference.operator.RealRandomWalkOperator" scaleFactor='0.1' weight="3" scalar="@growthRate.t:$(n)"/>
 
@@ -383,7 +383,7 @@ groupSizesDelta/index/=Operators/BactrianDeltaExchange/index/'>
 				jeffreys="true"
 				param="@bPopSizes.t:$(n)"/>
 
-		    <operator id='popSizesScaler.t:$(n)' spec='beast.base.spec.inference.operator.scale.ScaleVectorOperator' scaleFactor="0.75" weight="15" parameter="@bPopSizes.t:$(n)"/>
+		    <operator id='popSizesScaler.t:$(n)' spec='beast.base.spec.inference.operator.ScaleOperator' scaleFactor="0.75" weight="15" parameter="@bPopSizes.t:$(n)"/>
 		    <operator id='groupSizesDelta.t:$(n)' spec='beast.base.spec.inference.operator.DeltaExchangeOperator' delta="1" weight="6" integer="true"
 		              ivparameter="@bGroupSizes.t:$(n)"/>
 
@@ -488,7 +488,7 @@ EBSPLogger/mode/
 
 			<operator id="bitflip.alltrees" parameter="@indicators.alltrees" spec="beast.base.spec.inference.operator.BitFlipOperator" uniform="true" weight="30.0"/>
 			<operator id="indicatorSampler.alltrees" dist="@popPriorDist.EBSP" indicators="@indicators.alltrees" spec="beast.base.spec.inference.operator.SampleOffValues" values="@popSizes.alltrees" weight="15.0"/>
-			<operator id="indicatorScaler.alltrees" degreesOfFreedom="1" indicator="@indicators.alltrees" parameter="@popSizes.alltrees" scaleAll="false" scaleAllIndependently="false" scaleFactor="0.5"  spec='beast.base.spec.inference.operator.scale.ScaleVectorOperator' weight="15.0"/>
+			<operator id="indicatorScaler.alltrees" degreesOfFreedom="1" indicator="@indicators.alltrees" parameter="@popSizes.alltrees" scaleAll="false" scaleAllIndependently="false" scaleFactor="0.5"  spec='beast.base.spec.inference.operator.ScaleOperator' weight="15.0"/>
 			<operator id="EBSPupDownOperator.alltrees" scaleFactor="0.7" spec='beast.base.spec.evolution.operator.UpDownOperator' weight="5.0">
 				<up idref="popSizes.alltrees"/>
 				<up idref="populationMean.alltrees"/>
