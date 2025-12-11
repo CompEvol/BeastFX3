@@ -255,9 +255,9 @@ ClusterTree/clusterType/,
             <!-- site model                                                              -->
             <plugin spec='beast.base.spec.evolution.sitemodel.SiteModel' id="SiteModel.s:$(n)" gammaCategoryCount='0'>
                 <!--substModel will be automatically detected /-->
-                <proportionInvariant spec="beast.base.spec.inference.parameter.RealScalarParam" domain="UnitInterval" id='proportionInvariant.s:$(n)' value='0.0' lower='0' upper='1' estimate='false'/>
-                <mutationRate        spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" id='mutationRate.s:$(n)' value='1.0' lower="0.0" estimate='false'/>
-                <shape               spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" id='gammaShape.s:$(n)' value='1.0' lower="0.1" estimate='false'/>
+                <proportionInvariant spec="beast.base.spec.inference.parameter.RealScalarParam" domain="UnitInterval" id='proportionInvariant.s:$(n)' value='0.0' estimate='false'/>
+                <mutationRate        spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" id='mutationRate.s:$(n)' value='1.0' estimate='false'/>
+                <shape               spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" id='gammaShape.s:$(n)' value='1.0' estimate='false'/>
             </plugin>
 
             <plugin spec='beast.base.spec.evolution.likelihood.ThreadedTreeLikelihood' id="treeLikelihood.$(n)">
@@ -265,7 +265,7 @@ ClusterTree/clusterType/,
                 <tree idref="Tree.t:$(n)"/>
                 <siteModel idref="SiteModel.s:$(n)"/>
                 <branchRateModel spec='beast.base.spec.evolution.branchratemodel.StrictClockModel' id='StrictClock.c:$(n)'>
-                    <clock.rate id='clockRate.c:$(n)' spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value='1.0' lower="0.0" estimate='false'/>
+                    <clock.rate id='clockRate.c:$(n)' spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value='1.0' estimate='false'/>
                 </branchRateModel>
             </plugin>
 
@@ -288,7 +288,7 @@ ClusterTree/clusterType/,
 
             <!-- default tree prior -->
             <plugin spec='beast.base.spec.evolution.speciation.YuleModel' id="YuleModel.t:$(n)" tree='@Tree.t:$(n)'>
-                <parameter name='birthDiffRate' spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" id="birthRate.t:$(n)" lower="0.0" value='1.0'/>
+                <parameter name='birthDiffRate' spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" id="birthRate.t:$(n)" value='1.0'/>
             </plugin>
 
             <plugin id='TreeHeight.t:$(n)' spec='beast.base.evolution.tree.TreeStatLogger' tree='@Tree.t:$(n)'/>
@@ -317,8 +317,12 @@ ClusterTree/clusterType/,
                 <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="0.01" estimate="false"/>
                 <beta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="100.0" estimate="false"/>
             </distribution>
-            <distribution id='GammaShapePrior.s:$(n)' spec='beast.base.spec.inference.distribution.Exponential' param='@gammaShape.s:$(n)' >
-                <mean spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>
+            <distribution id='GammaShapePrior.s:$(n)' spec='beast.base.spec.inference.distribution.TruncatedRealDistribution' param='@gammaShape.s:$(n)'>
+	            <lower spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.1" estimate="false"/>
+    	        <!--upper spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="10000.0" estimate="false"/-->
+	            <distribution spec='beast.base.spec.inference.distribution.Exponential'>
+	                <mean spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>
+                </distribution>
             </distribution>
             <distribution id='PropInvariantPrior.s:$(n)' spec='beast.base.spec.inference.distribution.Beta' param='@proportionInvariant.s:$(n)' >
                 <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0" estimate="false"/>

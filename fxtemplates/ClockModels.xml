@@ -14,7 +14,7 @@
                         strictClockUpDownOperator/index/=Operators/BactrianUpDown/index/'>
             <![CDATA[
                 <branchRateModel spec='beast.base.spec.evolution.branchratemodel.StrictClockModel' id='StrictClock.c:$(n)'>
-                    <clock.rate id='clockRate.c:$(n)' spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value='1.0' lower="0.0" estimate='false'/>
+                    <clock.rate id='clockRate.c:$(n)' spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value='1.0' estimate='false'/>
                 </branchRateModel>
 
 		        <operator id="StrictClockRateScaler.c:$(n)" spec="beast.base.spec.evolution.operator.AdaptableOperatorSampler" weight="1.5">
@@ -79,9 +79,10 @@
                      '>
             <![CDATA[
         <input spec='beast.base.spec.evolution.branchratemodel.RandomLocalClockModel' id="RandomLocalClock.c:$(n)" ratesAreMultipliers="false" tree='@Tree.t:$(n)'>
-            <clock.rate id='meanClockRate.c:$(n)' spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value='1.0' lower="0.0" estimate='false'/>
+            <clock.rate id='meanClockRate.c:$(n)' spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value='1.0' estimate='false'/>
             <parameter spec='beast.base.spec.inference.parameter.BoolVectorParam' name='indicators' id='Indicators.c:$(n)' value="0"/>
-            <parameter spec='beast.base.spec.inference.parameter.RealVectorParam' domain="PositiveReal" name='rates' id='clockrates.c:$(n)' value="1" lower="1e-9"/>
+            <parameter spec='beast.base.spec.inference.parameter.RealVectorParam' domain="PositiveReal" name='rates' id='clockrates.c:$(n)' value="1"/> 
+            	<!-- lower="1e-9"/ -->
         </input>
 
         <operator id="IndicatorsBitFlip.c:$(n)" spec="beast.base.spec.inference.operator.BitFlipOperator" weight="15" parameter="@Indicators.c:$(n)"/>
