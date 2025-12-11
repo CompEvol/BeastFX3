@@ -26,10 +26,10 @@ import beast.base.spec.domain.NonNegativeReal;
 import beast.base.spec.domain.PositiveInt;
 import beast.base.spec.domain.PositiveReal;
 import beast.base.spec.domain.Real;
-import beast.base.spec.inference.distribution.OffsetRealDistribution;
+//import beast.base.spec.inference.distribution.OffsetRealDistribution;
 import beast.base.spec.inference.distribution.ScalarDistribution;
 import beast.base.spec.inference.distribution.TensorDistribution;
-import beast.base.spec.inference.distribution.TruncatedIntDistribution;
+//import beast.base.spec.inference.distribution.TruncatedIntDistribution;
 import beast.base.spec.inference.distribution.TruncatedRealDistribution;
 import beast.base.spec.inference.parameter.BoolScalarParam;
 import beast.base.spec.inference.parameter.IntScalarParam;
@@ -584,10 +584,10 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
     	if (graphPanel != null) {
     		if (m_beastObject instanceof TruncatedRealDistribution trd) {
     			trd.distributionInput.get().refresh();
-    		} else if (m_beastObject instanceof TruncatedIntDistribution tid) {
-    			tid.distributionInput.get().refresh();
-    		} else if (m_beastObject instanceof OffsetRealDistribution ord) {
-    			ord.distributionInput.get().refresh();
+    		} else if (m_beastObject.getClass().getName().endsWith("TruncatedIntDistribution")) {
+    			((ScalarDistribution)m_beastObject.getInput("distribution").get()).refresh();
+    		} else if (m_beastObject.getClass().getName().endsWith("OffsetRealDistribution")) {
+    			((ScalarDistribution)m_beastObject.getInput("distribution").get()).refresh();
     		}
     		graphPanel.paintComponent();
     	}
@@ -832,18 +832,26 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
 	        List<InputEditor> editors = doc.getInputEditorFactory().addInputs(expandBox, td.distributionInput.get(), this, null, doc);
 	        
 	        processVbox(editors);
-		} else if (m_beastObject instanceof TruncatedIntDistribution td) {
-			expandBox.getChildren().set(0, createComboBox(td.distributionInput.get(), td.distributionInput));
+		} else if (m_beastObject.getClass().getName().endsWith("TruncatedIntDistribution")
+				|| m_beastObject.getClass().getName().endsWith("OffsetRealDistribution")) {
+			((ScalarDistribution)m_beastObject.getInput("distribution").get()).refresh();
+			Input input = m_beastObject.getInput("distribution");
+			expandBox.getChildren().set(0, createComboBox((BEASTInterface)input.get(), input));
 			
-	        List<InputEditor> editors = doc.getInputEditorFactory().addInputs(expandBox, td.distributionInput.get(), this, null, doc);
+	        List<InputEditor> editors = doc.getInputEditorFactory().addInputs(expandBox, (BEASTInterface)input.get(), this, null, doc);
+			
+//		} else if (m_beastObject instanceof TruncatedIntDistribution td) {
+//			expandBox.getChildren().set(0, createComboBox(td.distributionInput.get(), td.distributionInput));
+//			
+//	        List<InputEditor> editors = doc.getInputEditorFactory().addInputs(expandBox, td.distributionInput.get(), this, null, doc);
 	        
 	        processVbox(editors);
-		} else if (m_beastObject instanceof OffsetRealDistribution od) {
-			expandBox.getChildren().set(0, createComboBox(od.distributionInput.get(), od.distributionInput));
-			
-	        List<InputEditor> editors = doc.getInputEditorFactory().addInputs(expandBox, od.distributionInput.get(), this, null, doc);
-	        
-	        processVbox(editors);
+//		} else if (m_beastObject instanceof OffsetRealDistribution od) {
+//			expandBox.getChildren().set(0, createComboBox(od.distributionInput.get(), od.distributionInput));
+//			
+//	        List<InputEditor> editors = doc.getInputEditorFactory().addInputs(expandBox, od.distributionInput.get(), this, null, doc);
+//	        
+//	        processVbox(editors);
 		}
 
 		removeBorder(expandBox);
