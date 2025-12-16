@@ -30,7 +30,7 @@ import beast.base.spec.domain.Real;
 import beast.base.spec.inference.distribution.ScalarDistribution;
 import beast.base.spec.inference.distribution.TensorDistribution;
 //import beast.base.spec.inference.distribution.TruncatedIntDistribution;
-import beast.base.spec.inference.distribution.TruncatedRealDistribution;
+import beast.base.spec.inference.distribution.TruncatedReal;
 import beast.base.spec.inference.parameter.BoolScalarParam;
 import beast.base.spec.inference.parameter.IntScalarParam;
 import beast.base.spec.inference.parameter.RealScalarParam;
@@ -582,7 +582,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
     @Override
     public void validateInput() {
     	if (graphPanel != null) {
-    		if (m_beastObject instanceof TruncatedRealDistribution trd) {
+    		if (m_beastObject instanceof TruncatedReal trd) {
     			trd.distributionInput.get().refresh();
     		} else if (m_beastObject.getClass().getName().endsWith("TruncatedIntDistribution")) {
     			((ScalarDistribution)m_beastObject.getInput("distribution").get()).refresh();
@@ -615,11 +615,15 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
         for (BeautiSubTemplate template : scalarTemplates) {
         	if (isCompatible(domain, templateDomains.get(k++)) || 
         		(param != null && 
-        			(template.getID().equals("BoundedReal") && isReal ||
-        			 template.getID().equals("BoundedInt") && !isReal ||
-        			 template.getID().equals("Offset")))) {
-        		if (!((template.getID().equals("BoundedReal") && isReal || template.getID().equals("BoundedInt") && !isReal) 
-        				|| template.getID().equals("Offset")) || param != null) {
+        			(template.getID().equals("BoundedReal") && isReal  ||
+        			 template.getID().equals("BoundedInt")  && !isReal ||
+        			 template.getID().equals("OffsetReal")  && isReal  || 
+        			 template.getID().equals("OffsetInt")   && !isReal))) {
+        		if (!(template.getID().equals("BoundedReal") && isReal   || 
+        			  template.getID().equals("BoundedInt")  && !isReal  || 
+        			  template.getID().equals("OffsetReal")  && isReal   || 
+        			  template.getID().equals("OffsetInt")   && !isReal) || 
+        				param != null) {
         			comboBox.getItems().add(template);
         		}
         	}
@@ -826,14 +830,10 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
 	public void setExpandBox(VBox expandBox) {
 		this.expandBox = expandBox;
 
-		if (m_beastObject instanceof TruncatedRealDistribution td) {
-			expandBox.getChildren().set(0, createComboBox(td.distributionInput.get(), td.distributionInput));
-			
-	        List<InputEditor> editors = doc.getInputEditorFactory().addInputs(expandBox, td.distributionInput.get(), this, null, doc);
-	        
-	        processVbox(editors);
-		} else if (m_beastObject.getClass().getName().endsWith("TruncatedIntDistribution")
-				|| m_beastObject.getClass().getName().endsWith("OffsetRealDistribution")) {
+		if (m_beastObject.getClass().getName().endsWith("TruncatedReal")
+				|| m_beastObject.getClass().getName().endsWith("TruncatedInt")
+				|| m_beastObject.getClass().getName().endsWith("OffsetReal")
+				|| m_beastObject.getClass().getName().endsWith("OffsetInt")) {
 			((ScalarDistribution)m_beastObject.getInput("distribution").get()).refresh();
 			Input input = m_beastObject.getInput("distribution");
 			expandBox.getChildren().set(0, createComboBox((BEASTInterface)input.get(), input));

@@ -317,7 +317,7 @@ ClusterTree/clusterType/,
                 <alpha spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="0.01" estimate="false"/>
                 <beta spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="100.0" estimate="false"/>
             </distribution>
-            <distribution id='GammaShapePrior.s:$(n)' spec='beast.base.spec.inference.distribution.TruncatedRealDistribution' param='@gammaShape.s:$(n)'>
+            <distribution id='GammaShapePrior.s:$(n)' spec='beast.base.spec.inference.distribution.TruncatedReal' param='@gammaShape.s:$(n)'>
 	            <lower spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="0.1" estimate="false"/>
     	        <!--upper spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="10000.0" estimate="false"/-->
 	            <distribution spec='beast.base.spec.inference.distribution.Exponential'>
