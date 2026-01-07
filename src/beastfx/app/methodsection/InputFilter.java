@@ -14,8 +14,8 @@ import beast.base.core.Input;
 import beast.base.core.Log;
 import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.alignment.FilteredAlignment;
-import beast.base.evolution.likelihood.ThreadedTreeLikelihood;
-import beast.base.evolution.likelihood.TreeLikelihood;
+import beast.base.spec.evolution.likelihood.TreeLikelihood;
+import beast.base.spec.evolution.likelihood.ThreadedTreeLikelihood;
 import beast.base.util.Randomizer;
 import beastfx.app.inputeditor.BeautiDoc;
 
@@ -240,7 +240,9 @@ public class InputFilter {
 				// hack to deal with ThreadedTreeLikelihood instantiating itself
 				// with TreeLikelihoods
 				// in a private input
-				if (!(bo instanceof ThreadedTreeLikelihood) || !(bo2 instanceof TreeLikelihood)) {
+				if (!(bo instanceof ThreadedTreeLikelihood) || !(bo2 instanceof TreeLikelihood)
+						||!(bo instanceof beast.base.evolution.likelihood.ThreadedTreeLikelihood) 
+						||!(bo2 instanceof beast.base.evolution.likelihood.TreeLikelihood)) {
 					if (!predecessors.contains(bo2)) {
 						collectPredecessors(bo2, predecessors);
 					}

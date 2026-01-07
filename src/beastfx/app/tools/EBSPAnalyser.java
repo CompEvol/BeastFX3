@@ -14,9 +14,9 @@ import beast.base.core.BEASTVersion2;
 import beast.base.core.Description;
 import beast.base.core.Input;
 import beast.base.core.Log;
-import beast.base.evolution.tree.coalescent.CompoundPopulationFunction;
-import beast.base.evolution.tree.coalescent.CompoundPopulationFunction.Type;
 import beast.base.inference.Runnable;
+import beast.base.spec.evolution.tree.coalescent.CompoundPopulationFunction;
+import beast.base.spec.evolution.tree.coalescent.CompoundPopulationFunction.Type;
 import beast.base.util.DiscreteStatistics;
 import beast.base.util.HeapSort;
 

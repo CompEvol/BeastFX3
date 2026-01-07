@@ -18,7 +18,6 @@ import beast.base.core.Input;
 import beast.base.core.Input.Validate;
 import beast.base.core.Log;
 import beast.base.evolution.alignment.Alignment;
-import beast.base.evolution.likelihood.GenericTreeLikelihood;
 import beast.base.evolution.tree.TraitSet;
 import beast.base.evolution.tree.Tree;
 import beast.base.evolution.tree.TreeDistribution;
@@ -28,9 +27,11 @@ import beast.base.inference.Distribution;
 import beast.base.inference.MCMC;
 import beast.base.inference.Operator;
 import beast.base.inference.StateNode;
-import beast.base.inference.operator.DeltaExchangeOperator;
 import beast.base.parser.ClassToPackageMap;
 import beast.base.parser.XMLParser;
+import beast.base.spec.evolution.likelihood.GenericTreeLikelihood;
+import beast.base.spec.inference.operator.DeltaExchangeOperator;
+import beast.base.spec.type.Tensor;
 import beastfx.app.inputeditor.BeautiConfig;
 import beastfx.app.inputeditor.BeautiDoc;
 import beastfx.app.methodsection.Phrase.PhraseType;
@@ -536,8 +537,8 @@ public class XML2Text extends beast.base.inference.Runnable {
         for (Operator op : mcmc.operatorsInput.get()) {
         	if (op.getID().equals("FixMeanMutationRatesOperator")) {
                 List<String> partitionIDs = new ArrayList<>();
-                for (StateNode s : ((DeltaExchangeOperator)op).parameterInput.get()) {
-                	partitionIDs.add(BeautiDoc.parsePartition(s.getID()));
+                for (Tensor<?,?> s : ((DeltaExchangeOperator)op).parameterInput.get()) {
+                	partitionIDs.add(BeautiDoc.parsePartition(((BEASTInterface)s).getID()));
                 }
         		b.append("Relative substitution rates among ");
         		if (partitionIDs.size() != beautiDoc.alignments.size()) {

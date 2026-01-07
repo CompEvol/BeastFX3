@@ -9,6 +9,7 @@ import beast.base.core.Input;
 import beast.base.inference.StateNode;
 import beast.base.inference.parameter.Parameter;
 import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.type.Scalar;
 import beastfx.app.inputeditor.BeautiDoc;
 
 /** Contains information about a word or phrase in the MethodsText,
@@ -175,10 +176,11 @@ public class Phrase {
 			} else if (phrase instanceof CitationPhrase) {
 				int counter = ((CitationPhrase)phrase).counter;
 				b.append("<sup><a href='/cmd=CitationPhrase counter=" + counter+ "'>[" + counter + "]</a></sup>");
-			} else if (phrase.source instanceof RealParameter) {
+			} else if (phrase.source instanceof RealParameter || phrase.source instanceof Scalar){
 				b.append(" <a class='para' href='/cmd=RealParameter id=" + ((BEASTInterface) phrase.source).getID()+ "'>" + phrase.toString() + "</a>");
 
-			} else if (phrase.parent != null && phrase.parent instanceof Parameter<?> && phrase.input.getName().equals("value")) {
+			} else if (phrase.parent != null && (phrase.parent instanceof Parameter<?> || phrase.parent instanceof Scalar) 
+				&& phrase.input.getName().equals("value")) {
 				// String source = phrase.parent.getID() + " " + phrase.input.getName();
 		        String text = phrase.source.toString();
 		        text = text.substring(1, text.length() - 1);

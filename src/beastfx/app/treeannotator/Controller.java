@@ -5,9 +5,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import beast.base.core.Log;
 import beast.pkgmgmt.BEASTClassLoader;
-import beastfx.app.treeannotator.TreeAnnotator.Target;
 import beastfx.app.treeannotator.services.NodeHeightSettingService;
 import beastfx.app.treeannotator.services.TopologySettingService;
 import javafx.application.Platform;

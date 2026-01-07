@@ -8,7 +8,6 @@ import java.util.Optional;
 import beast.base.core.Log;
 import beast.pkgmgmt.BEASTVersion;
 import beastfx.app.beauti.ThemeProvider;
-import beastfx.app.treeannotator.TreeAnnotator.Target;
 import beastfx.app.treeannotator.services.UserTargetTreeTopologyService;
 import beastfx.app.util.Console;
 import javafx.fxml.FXMLLoader;

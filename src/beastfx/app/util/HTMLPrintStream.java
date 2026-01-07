@@ -1,7 +1,6 @@
 package beastfx.app.util;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 

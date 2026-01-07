@@ -5,7 +5,6 @@ import java.io.PrintStream;
 import java.util.BitSet;
 
 import beast.base.core.Citation;
-import beast.base.core.Log;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.Tree;
 import beast.base.evolution.tree.TreeUtils;

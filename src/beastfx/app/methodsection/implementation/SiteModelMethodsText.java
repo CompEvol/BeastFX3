@@ -2,8 +2,10 @@ package beastfx.app.methodsection.implementation;
 
 import beast.base.core.BEASTInterface;
 import beast.base.core.Input;
-import beast.base.evolution.sitemodel.SiteModel;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.evolution.sitemodel.SiteModel;
+import beast.base.spec.inference.parameter.RealScalarParam;
+import beast.base.spec.type.RealScalar;
 import beastfx.app.inputeditor.BeautiDoc;
 import beastfx.app.methodsection.MethodsText;
 import beastfx.app.methodsection.MethodsTextFactory;
@@ -30,15 +32,15 @@ public class SiteModelMethodsText implements MethodsText {
 		b.addAll(substModel);
 		if (sm.gammaCategoryCount.get() > 1) {
 			b.add(new Phrase(" with gamma rate heterogeneity using " + sm.gammaCategoryCount.get() + " categories "));
-			RealParameter shape = sm.shapeParameterInput.get();
-			if (shape.isEstimatedInput.get()) {
+			RealScalar<PositiveReal> shape = sm.shapeParameterInput.get();
+			if (shape instanceof RealScalarParam p && p.isEstimatedInput.get()) {
 				b.add(new Phrase(" and shape "));
-				b.addAll(describePriors(shape, sm, sm.shapeParameterInput, doc));
+				b.addAll(describePriors(p, sm, sm.shapeParameterInput, doc));
 			} else {
-				b.add(new Phrase(" and shape = " + shape.getValue() + ""));
+				b.add(new Phrase(" and shape = " + shape.get() + ""));
 			}
 		}
-		if (sm.invarParameterInput.get() != null && sm.invarParameterInput.get().getValue() > 0) {
+		if (sm.invarParameterInput.get() != null && sm.invarParameterInput.get().get() > 0) {
 			b.add(new Phrase(" and a category proportion invarible "));
 		}
 		return b;

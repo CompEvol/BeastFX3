@@ -18,8 +18,8 @@ import java.util.concurrent.Executors;
 import beastfx.app.util.Utils;
 import beast.base.core.BEASTVersion2;
 import beast.base.core.Log;
-import beast.base.inference.util.ESS;
 import beast.base.parser.OutputUtils;
+import beast.base.spec.inference.util.ESS;
 import beast.base.util.CollectionUtils;
 
 

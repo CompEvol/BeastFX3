@@ -3,18 +3,10 @@ package beastfx.app.util;
 
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.Optional;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import beast.base.core.BEASTInterface;
 import beastfx.app.beauti.ThemeProvider;
@@ -32,7 +24,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 // javafx replacement of joptionpane
