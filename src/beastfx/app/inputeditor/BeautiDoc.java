@@ -4,6 +4,7 @@ package beastfx.app.inputeditor;
 
 
 
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -65,11 +66,13 @@ import beast.base.evolution.branchratemodel.BranchRateModel;
 import beast.base.spec.evolution.branchratemodel.Base;
 import beast.base.spec.evolution.branchratemodel.StrictClockModel;
 import beast.base.spec.evolution.likelihood.GenericTreeLikelihood;
+import beast.base.spec.evolution.tree.MRCAPrior;
+import beast.base.spec.inference.distribution.Normal;
+import beast.base.spec.inference.distribution.ScalarDistribution;
 import beast.base.spec.inference.parameter.RealScalarParam;
 import beast.base.spec.inference.parameter.RealVectorParam;
 import beast.base.evolution.operator.TipDatesRandomWalker;
 import beast.base.evolution.substitutionmodel.SubstitutionModel;
-import beast.base.evolution.tree.MRCAPrior;
 import beast.base.evolution.tree.TraitSet;
 import beast.base.evolution.tree.Tree;
 import beast.base.evolution.tree.TreeInterface;
@@ -77,8 +80,6 @@ import beast.base.inference.CompoundDistribution;
 import beast.base.inference.Distribution;
 import beast.base.inference.MCMC;
 import beast.base.inference.StateNode;
-import beast.base.inference.distribution.Normal;
-import beast.base.inference.distribution.ParametricDistribution;
 import beast.base.inference.distribution.Prior;
 import beast.base.inference.parameter.Parameter;
 //import beast.base.inference.parameter.RealParameter;
@@ -2637,7 +2638,7 @@ public class BeautiDoc extends BEASTObject implements RequiredInputProvider {
 
         CompoundDistribution prior = (CompoundDistribution) pluginmap.get("prior");
         mrcaPrior.treeInput.setValue(tree, mrcaPrior);
-        ParametricDistribution distr = mrcaPrior.distInput.get();
+        ScalarDistribution<?, ?> distr = mrcaPrior.distInput.get();
 
         TaxonSet t = mrcaPrior.taxonsetInput.get();
         if (taxaset.keySet().contains(t.getID())) {
@@ -2653,7 +2654,7 @@ public class BeautiDoc extends BEASTObject implements RequiredInputProvider {
                     taxaset.put(taxa.get(i).getID(), taxa.get(i));
                 }
             }
-            if (distr instanceof Normal && (Double.isInfinite(((Normal)distr).sigmaInput.get().getArrayValue()))) {
+            if (distr instanceof Normal && (Double.isInfinite(((Normal)distr).sdInput.get().get()))) {
                 // it is a 'fixed' calibration, no need to add a distribution
             } else {
                 prior.pDistributions.setValue(mrcaPrior, prior);
@@ -2662,7 +2663,7 @@ public class BeautiDoc extends BEASTObject implements RequiredInputProvider {
         }
         if (t.taxonsetInput.get().size() == 1 && distr != null) {
             // only add operators if it is NOT a 'fixed' calibration
-            if (!(distr instanceof Normal && (Double.isInfinite(((Normal)distr).sigmaInput.get().getArrayValue())))) {
+            if (!(distr instanceof Normal && (Double.isInfinite(((Normal)distr).sdInput.get().get())))) {
                 TipDatesRandomWalker operator = new TipDatesRandomWalker();
                 t.initAndValidate();
                 operator.initByName("taxonset", t, "weight", 1.0, "tree", tree, "windowSize", 1.0);

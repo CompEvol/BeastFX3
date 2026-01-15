@@ -121,11 +121,16 @@ public class TaxonSetInputEditor extends InputEditor.Base {
 //            taxonSetToModel();
 //            modelToTaxonset();
         }
-        for (Taxon taxonset2 : m_taxonset) {
-            for (Taxon taxon : ((TaxonSet) taxonset2).taxonsetInput.get()) {
-                m_lineageset.add(taxon);
-                m_taxonMap.put(taxon.getID(), taxonset2.getID());
-            }
+        for (Taxon t : m_taxonset) {
+        	if (t instanceof TaxonSet taxonset2) {
+	            for (Taxon taxon : ((TaxonSet) taxonset2).taxonsetInput.get()) {
+	                m_lineageset.add(taxon);
+	                m_taxonMap.put(taxon.getID(), taxonset2.getID());
+	            }
+        	} else {
+                m_lineageset.add(t);
+                m_taxonMap.put(t.getID(), taxonset.getID());
+        	}
         }
         taxonSetToModel();
         modelToTaxonset();
@@ -681,9 +686,10 @@ public class TaxonSetInputEditor extends InputEditor.Base {
 
         // clear old taxon sets
         for (Taxon taxon : m_taxonset) {
-            TaxonSet set = (TaxonSet) taxon;
-            set.taxonsetInput.get().clear();
-            doc.registerPlugin(set);
+        	if (taxon instanceof TaxonSet set) {
+	            set.taxonsetInput.get().clear();
+	            doc.registerPlugin(set);
+        	}
         }
 
         // group lineages with their taxon sets
@@ -692,13 +698,14 @@ public class TaxonSetInputEditor extends InputEditor.Base {
                 if (taxon.getID().equals(lineageID)) {
                     String taxonSet = m_taxonMap.get(lineageID);
                     for (Taxon taxon2 : m_taxonset) {
-                        TaxonSet set = (TaxonSet) taxon2;
-                        if (set.getID().equals(taxonSet)) {
-                            try {
-                                set.taxonsetInput.setValue(taxon, set);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                    	if (taxon2 instanceof TaxonSet set) {
+	                        if (set.getID().equals(taxonSet)) {
+	                            try {
+	                                set.taxonsetInput.setValue(taxon, set);
+	                            } catch (Exception e) {
+	                                e.printStackTrace();
+	                            }
+	                        }
                         }
                     }
                 }
@@ -707,9 +714,11 @@ public class TaxonSetInputEditor extends InputEditor.Base {
 
         // remove unused taxon sets
         for (int i = m_taxonset.size() - 1; i >= 0; i--) {
-            if (((TaxonSet) m_taxonset.get(i)).taxonsetInput.get().size() == 0) {
-                doc.unregisterPlugin(m_taxonset.get(i));
-                m_taxonset.remove(i);
+        	if (m_taxonset.get(i) instanceof TaxonSet set) {
+	            if (set.taxonsetInput.get().size() == 0) {
+	                doc.unregisterPlugin(m_taxonset.get(i));
+	                m_taxonset.remove(i);
+	            }
             }
         }
 

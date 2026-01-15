@@ -11,13 +11,16 @@ import beastfx.app.inputeditor.BeautiDoc;
 import beastfx.app.inputeditor.TaxonSetDialog;
 import beast.base.evolution.alignment.Taxon;
 import beast.base.evolution.alignment.TaxonSet;
-import beast.base.evolution.tree.MRCAPrior;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.evolution.tree.MRCAPrior;
+import beast.base.spec.inference.distribution.Gamma;
+import beast.base.spec.inference.distribution.LogNormal;
+import beast.base.spec.inference.parameter.RealScalarParam;
 import beast.base.evolution.tree.Tree;
 import beast.base.inference.Distribution;
 import beast.base.inference.Logger;
 import beast.base.inference.State;
 import beast.base.inference.StateNode;
-import beast.base.inference.distribution.OneOnX;
 
 public class MRCAPriorProvider implements PriorProvider {
 	
@@ -76,7 +79,10 @@ public class MRCAPriorProvider implements PriorProvider {
             prior.taxonsetInput.setValue(taxonSet, prior);
             prior.setID(taxonSet.getID() + ".prior");
             // this sets up the type
-            prior.distInput.setValue(new OneOnX(), prior);
+            prior.distInput.setValue(new Gamma(null,
+            		new RealScalarParam<>(0.01, PositiveReal.INSTANCE), // shape 
+            		new RealScalarParam<>(0.01, PositiveReal.INSTANCE)) // rate
+            		, prior);
             // this removes the parametric distribution
             prior.distInput.setValue(null, prior);
 

@@ -2,6 +2,7 @@ package beastfx.app.inputeditor;
 
 
 
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,13 +25,15 @@ import beast.base.core.Log;
 import beast.base.evolution.alignment.Taxon;
 import beast.base.evolution.alignment.TaxonSet;
 import beast.base.evolution.operator.TipDatesRandomWalker;
-import beast.base.evolution.tree.MRCAPrior;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.evolution.tree.MRCAPrior;
+import beast.base.spec.inference.distribution.Gamma;
+import beast.base.spec.inference.parameter.RealScalarParam;
 import beast.base.evolution.tree.Tree;
 import beast.base.inference.CompoundDistribution;
 import beast.base.inference.Distribution;
 import beast.base.inference.Operator;
 import beast.base.inference.State;
-import beast.base.inference.distribution.OneOnX;
 import beast.base.parser.PartitionContext;
 
 
@@ -106,7 +109,12 @@ public class MRCAPriorInputEditor extends InputEditor.Base implements HasExpandB
 
         if (prior.distInput.getType() == null) {
             try {
-                prior.distInput.setValue(new OneOnX(), prior);
+                // this sets up the type
+                prior.distInput.setValue(new Gamma(null,
+                		new RealScalarParam<>(0.01, PositiveReal.INSTANCE), // shape 
+                		new RealScalarParam<>(0.01, PositiveReal.INSTANCE)) // rate
+                		, prior);
+                // this removes the distribution
                 prior.distInput.setValue(null, prior);
             } catch (Exception e) {
                 // TODO: handle exception

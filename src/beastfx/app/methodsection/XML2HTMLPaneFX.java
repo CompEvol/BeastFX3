@@ -64,7 +64,7 @@ import beast.base.core.BEASTInterface;
 import beast.base.inference.MCMC;
 import beast.base.core.Log;
 import beast.base.evolution.alignment.Alignment;
-import beast.base.evolution.tree.MRCAPrior;
+import beast.base.spec.evolution.tree.MRCAPrior;
 import beast.pkgmgmt.Package;
 import beast.pkgmgmt.PackageManager;
 import beast.base.parser.XMLParser;

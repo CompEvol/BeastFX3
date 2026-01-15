@@ -1,6 +1,7 @@
 package beastfx.app.inputeditor;
 
 
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JComponent;
 import beastfx.app.util.Alert;
 import beastfx.app.util.FXUtils;
 import javafx.scene.Parent;
@@ -18,7 +18,7 @@ import beast.base.core.Description;
 import beast.base.core.Input;
 import beast.base.core.Input.Validate;
 import beast.base.evolution.alignment.Alignment;
-import beast.base.evolution.tree.MRCAPrior;
+import beast.base.spec.evolution.tree.MRCAPrior;
 import beast.base.parser.XMLParser;
 
 @Description("Beauti configuration object, used to find Beauti configuration " +

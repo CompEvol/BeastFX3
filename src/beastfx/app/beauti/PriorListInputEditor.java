@@ -3,6 +3,7 @@ package beastfx.app.beauti;
 
 
 
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,7 +29,7 @@ import beast.base.core.BEASTInterface;
 import beast.base.core.Input;
 import beast.base.evolution.alignment.Taxon;
 import beast.base.evolution.alignment.TaxonSet;
-import beast.base.evolution.tree.MRCAPrior;
+import beast.base.spec.evolution.tree.MRCAPrior;
 import beast.base.evolution.tree.Tree;
 import beast.base.evolution.tree.TreeDistribution;
 import beast.base.evolution.tree.TreeInterface;
