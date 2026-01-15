@@ -106,8 +106,8 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
     	}
     	
     	
-        useDefaultBehavior = !(beastObject instanceof ScalarDistribution) || 
-        		((ScalarDistribution<?,?>)beastObject).getApacheDistribution() == null;
+        useDefaultBehavior = !(beastObject instanceof TensorDistribution); //|| 
+        		//((ScalarDistribution<?,?>)beastObject).getApacheDistribution() == null;
 
         m_bAddButtons = addButtons;
         m_input = input;
@@ -413,12 +413,12 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
             double minValue = 0.1;
             double maxValue = 1;
             try {
-                minValue = m_distr.inverseCumulativeProbability(0.01);
+                minValue = (Double) m_distr.inverseCumulativeProbability(0.01);
             } catch (Throwable e) {
                 // use default
             }
             try {
-                maxValue = m_distr.inverseCumulativeProbability(0.99);
+                maxValue = (Double) m_distr.inverseCumulativeProbability(0.99);
             } catch (Throwable e) {
             	// use default
             }
@@ -487,7 +487,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
             mayBeUnstable = false;
             for (k = 0; k < 5; k++) {
                 try {
-                    info2 += format(m_distr.inverseCumulativeProbability(quantiles[k]));
+                    info2 += format((Double) m_distr.inverseCumulativeProbability(quantiles[k]));
                 } catch (MathException | RuntimeException e) {
                 	info2 += "not available";
                 }
@@ -676,6 +676,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
 			            ScalarDistribution<?,?> prior1 = null;
 		            	prior1 = (ScalarDistribution<?,?>) list.get(itemNr);
 		            	Object o = ((ScalarDistribution<?,?>) m_beastObject).paramInput.get();
+		            	((BEASTInterface) o).getOutputs().remove(prior1);
 		            	Input<ScalarDistribution<?,?>> input_ = new Input<>("param", "dummy input");
 		            	input_.setType(ScalarDistribution.class);
 		            	ScalarDistribution<?,?> newDist = (ScalarDistribution<?,?>) template.createSubNet(context, prior1, input_, true);
