@@ -120,11 +120,12 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
             m_beastObject = (ScalarDistribution<?, ?>) beastObject.getInput("distr").get();
         }
 
-        if (useDefaultBehavior && (beastObject instanceof TensorDistribution)) {
+        if (useDefaultBehavior && (beastObject instanceof MRCAPrior)) {
         	useDefaultBehavior = false;
         	pane = new HBox();
         	expandedInit(input, beastObject);
         	pane = (Pane) pane.getChildren().get(1);
+        	setExpandBox(m_expansionBox);
             registerAsListener(pane);
             getChildren().add(pane);
             return;

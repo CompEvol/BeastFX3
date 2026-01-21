@@ -9,7 +9,7 @@ package beastfx.app.inputeditor.spec;
 import beast.base.core.BEASTInterface;
 import beast.base.core.Input;
 import beast.base.evolution.alignment.Alignment;
-import beast.base.evolution.likelihood.GenericTreeLikelihood;
+import beast.base.spec.evolution.likelihood.GenericTreeLikelihood;
 import beast.base.spec.evolution.sitemodel.SiteModel;
 import beast.base.evolution.sitemodel.SiteModelInterface;
 import beast.base.inference.*;
@@ -125,12 +125,6 @@ public class SiteModelInputEditor extends BEASTObjectInputEditor {
 		setUpOperator();
     }
     
-//	@Override
-//    public Class<?> [] types() {
-//		Class<?>[] types = {SiteModel.class, SiteModel.Base.class}; 
-//		return types;
-//    }
-
 	private void doFixMeanRates(boolean averageRates) {
 		List<Operator> operators = ((MCMC) doc.mcmc.get()).operatorsInput.get();
 		if (averageRates) {

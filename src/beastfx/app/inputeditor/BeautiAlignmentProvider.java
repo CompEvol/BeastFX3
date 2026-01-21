@@ -11,15 +11,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 
-import javafx.scene.control.ComboBox;
 import beastfx.app.util.Alert;
 import beastfx.app.util.FXUtils;
 
@@ -39,15 +35,10 @@ import beast.base.core.Input;
 import beast.base.core.ProgramStatus;
 import beast.base.core.Input.Validate;
 import beast.base.evolution.alignment.Alignment;
-import beast.base.evolution.alignment.FilteredAlignment;
 import beast.base.evolution.alignment.Sequence;
-import beast.base.evolution.datatype.DataType;
-import beast.base.evolution.tree.MRCAPrior;
-import beast.base.parser.NexusParser;
+import beast.base.spec.evolution.tree.MRCAPrior;
 import beast.base.parser.XMLParser;
 import beast.pkgmgmt.BEASTClassLoader;
-import beast.pkgmgmt.PackageManager;
-import beast.pkgmgmt.Utils6;
 
 
 @Description("Class for creating new alignments to be edited by AlignmentListInputEditor")

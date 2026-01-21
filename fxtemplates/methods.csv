@@ -3,6 +3,7 @@ analysisIdentifier,popModelAIM.Species
 analysisIdentifier,popModelBridge.Species
 
 auxTreePrior,beast.base.evolution.tree.MRCAPrior
+auxTreePrior,beast.base.spec.evolution.tree.MRCAPrior
 auxTreePrior,beast.math.distributions.MultiMonophyleticConstraint
 auxTreePrior,beast.base.evolution.tree.MRCAPriorWithRogues
 auxTreePrior,beast.math.distributions.MultiMRCAPriors

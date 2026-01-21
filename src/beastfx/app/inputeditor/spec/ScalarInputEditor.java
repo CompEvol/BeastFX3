@@ -71,12 +71,12 @@ public class ScalarInputEditor extends BEASTObjectInputEditor {
         	if (itemNr < 0) {
         		Scalar<?,?> parameter = (Scalar<?,?>) m_input.get();
         		String s = "";
-        		s += parameter.get() + " ";
+        		s += parameter.get();
         		m_entry.setText(s);
         	} else {
         		Scalar<?,?> parameter = (Scalar<?,?>) ((List<?>)m_input.get()).get(itemNr);
         		String s = "";
-        		s += parameter.get() + " ";
+        		s += parameter.get();
         		m_entry.setText(s);
         	}
         }

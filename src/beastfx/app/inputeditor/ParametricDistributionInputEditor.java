@@ -12,7 +12,7 @@ import org.apache.commons.math.MathException;
 
 import beast.base.core.BEASTInterface;
 import beast.base.core.Input;
-import beast.base.evolution.tree.MRCAPrior;
+import beast.base.spec.evolution.tree.MRCAPrior;
 import beast.base.evolution.tree.TreeDistribution;
 import beast.base.inference.distribution.ParametricDistribution;
 import beast.base.inference.distribution.Prior;
