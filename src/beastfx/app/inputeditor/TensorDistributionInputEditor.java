@@ -6,22 +6,14 @@ package beastfx.app.inputeditor;
 
 
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.math.MathException;
-
 import beast.base.core.BEASTInterface;
 import beast.base.core.Input;
-import beast.base.core.Log;
 import beast.base.inference.Distribution;
 import beast.base.parser.PartitionContext;
-import beast.base.spec.Bounded;
 import beast.base.spec.domain.Int;
 import beast.base.spec.domain.NonNegativeInt;
 import beast.base.spec.domain.NonNegativeReal;
@@ -40,20 +32,12 @@ import beast.base.spec.type.IntVector;
 import beast.base.spec.type.RealScalar;
 import beast.base.spec.type.RealVector;
 import beast.base.spec.type.Scalar;
-import beast.base.spec.type.Tensor;
 import beastfx.app.util.FXUtils;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.Tooltip;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -114,7 +98,10 @@ public class TensorDistributionInputEditor extends BEASTObjectInputEditor implem
         } else {
         	pane = new HBox();
         }
-        pane.getChildren().add(createComboBox());
+        ComboBox<?> distributionCombBox = createComboBox();
+        if (distributionCombBox != null) {
+        	pane.getChildren().add(distributionCombBox);
+        }
         
         
         
@@ -289,7 +276,10 @@ public class TensorDistributionInputEditor extends BEASTObjectInputEditor implem
         	}
         }
         
-        
+        if (comboBox.getItems().size() == 0) {
+        	return null;
+        }
+        	
         comboBox.setId(text+".distr");
         comboBox.setButtonCell(new ListCell<BeautiSubTemplate>() {
         	@Override

@@ -14,7 +14,6 @@ import beast.base.evolution.alignment.TaxonSet;
 import beast.base.spec.domain.PositiveReal;
 import beast.base.spec.evolution.tree.MRCAPrior;
 import beast.base.spec.inference.distribution.Gamma;
-import beast.base.spec.inference.distribution.LogNormal;
 import beast.base.spec.inference.parameter.RealScalarParam;
 import beast.base.evolution.tree.Tree;
 import beast.base.inference.Distribution;

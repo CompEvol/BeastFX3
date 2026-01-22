@@ -27,6 +27,7 @@ import beast.base.spec.domain.PositiveInt;
 import beast.base.spec.domain.PositiveReal;
 import beast.base.spec.domain.Real;
 import beast.base.spec.evolution.tree.MRCAPrior;
+import beast.base.spec.inference.distribution.IID;
 //import beast.base.spec.inference.distribution.OffsetRealDistribution;
 import beast.base.spec.inference.distribution.ScalarDistribution;
 import beast.base.spec.inference.distribution.TensorDistribution;
@@ -260,16 +261,26 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
     		// check the parent distribution
     		for (Object o : m_beastObject.getOutputs()) {
     			if (o instanceof ScalarDistribution sd) {
-    				Class<?> class_ = getParameterDomain(sd.paramInput.get());
-    				if (Real.class.isAssignableFrom(class_)) {
-    					return Real.class;
-    				} else {
-    					return Int.class;
+    				Object o2 = sd.paramInput.get();
+    				if (o2 != null) {
+	    				Class<?> class_ = getParameterDomain(o2);
+	    				return class_;
     				}
     			}
     		}
+    		if (m_beastObject instanceof TensorDistribution sd) {
+				try {
+    				Input<?> input = sd.getInput("param");
+    				if (input != null && input.get() != null) {
+	    				Class<?> class_ = getParameterDomain(input.get());
+	    				return class_;
+    				}
+				} catch (Throwable e) {
+					// ignore
+				}
+    		}
     	}
-        return Real.class;
+    	return Real.class;
 	}
 
 	String paramToString(RealScalar<?> p) {
@@ -419,12 +430,12 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
             double minValue = 0.1;
             double maxValue = 1;
             try {
-                minValue = (Double) m_distr.inverseCumulativeProbability(0.01);
+            	minValue = inverseCumulativeProbability(m_distr, 0.01);
             } catch (Throwable e) {
                 // use default
             }
             try {
-                maxValue = (Double) m_distr.inverseCumulativeProbability(0.99);
+                maxValue = inverseCumulativeProbability(m_distr, 0.99);
             } catch (Throwable e) {
             	// use default
             }
@@ -493,7 +504,7 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
             mayBeUnstable = false;
             for (k = 0; k < 5; k++) {
                 try {
-                    info2 += format((Double) m_distr.inverseCumulativeProbability(quantiles[k]));
+                    info2 += format(inverseCumulativeProbability(m_distr, quantiles[k]));
                 } catch (MathException | RuntimeException e) {
                 	info2 += "not available";
                 }
@@ -514,6 +525,16 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
             infoLabel2.setText(info2);
             infoLabel3.setText(info3);
         }
+
+		private double inverseCumulativeProbability(ScalarDistribution<?, ?> m_distr, double level) throws MathException {
+            Object o = m_distr.inverseCumulativeProbability(level);
+            if (o instanceof Double d) {
+            	return d;
+            } else if (o instanceof Integer i) {
+               	return i;
+            }
+			return 0;
+		}
 
 		private String format(double value) {
             StringWriter writer = new StringWriter();
@@ -624,21 +645,25 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
         boolean isReal = Real.class.isAssignableFrom(domain);
         for (BeautiSubTemplate template : scalarTemplates) {
         	if (isCompatible(domain, templateDomains.get(k++)) || 
-        		(param != null && 
+        		(//param != null && 
         			(template.getID().equals("BoundedReal") && isReal  ||
         			 template.getID().equals("BoundedInt")  && !isReal ||
         			 template.getID().equals("OffsetReal")  && isReal  || 
         			 template.getID().equals("OffsetInt")   && !isReal))) {
-        		if (!(template.getID().equals("BoundedReal") && isReal   || 
-        			  template.getID().equals("BoundedInt")  && !isReal  || 
-        			  template.getID().equals("OffsetReal")  && isReal   || 
-        			  template.getID().equals("OffsetInt")   && !isReal) || 
-        				param != null) {
+//        		if (!(template.getID().equals("BoundedReal") && isReal   || 
+//        			  template.getID().equals("BoundedInt")  && !isReal  || 
+//        			  template.getID().equals("OffsetReal")  && isReal   || 
+//        			  template.getID().equals("OffsetInt")   && !isReal) || 
+//        				param != null) {
         			comboBox.getItems().add(template);
-        		}
+//        		}
         	}
         }
         
+        if (comboBox.getItems().size() == 0) {
+        	return null;
+        }
+
         
         comboBox.setId(text+".distr");
         comboBox.setButtonCell(new ListCell<BeautiSubTemplate>() {
@@ -847,7 +872,10 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
 				|| m_beastObject.getClass().getName().endsWith("OffsetInt")) {
 			((ScalarDistribution)m_beastObject.getInput("distribution").get()).refresh();
 			Input input = m_beastObject.getInput("distribution");
-			expandBox.getChildren().set(0, createComboBox((BEASTInterface)input.get(), input));
+			ComboBox<?> distributionComboBox = createComboBox((BEASTInterface)input.get(), input);
+			if (distributionComboBox != null) {
+				expandBox.getChildren().set(0, distributionComboBox);
+			}
 			
 	        List<InputEditor> editors = doc.getInputEditorFactory().addInputs(expandBox, (BEASTInterface)input.get(), this, null, doc);
 			
@@ -864,6 +892,18 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
 //	        
 //	        processVbox(editors);
 		}
+		if (m_beastObject instanceof IID<?, ?, ?>) {
+			Input input = m_beastObject.getInput("distr");
+			ComboBox<?> distributionComboBox = createComboBox((BEASTInterface)input.get(), input);
+			if (distributionComboBox != null) {
+				expandBox.getChildren().set(0, distributionComboBox);
+			}
+			
+	        List<InputEditor> editors = doc.getInputEditorFactory().addInputs(expandBox, (BEASTInterface)input.get(), this, null, doc);
+	        
+	        processVbox(editors);
+		}
+	
 
 		removeBorder(expandBox);
 

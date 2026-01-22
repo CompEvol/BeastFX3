@@ -97,9 +97,11 @@ public class IIDInputEditor extends ScalarDistributionInputEditor {
         pane = new HBox();
         addInputLabel();
             //super.init(input, beastObject, itemNr, ExpandOption.FALSE, addButtons);
-        pane.getChildren().add(createComboBox());
+        ComboBox<?> distributionComboBox = createComboBox();
+        if (distributionComboBox != null) {
+        	pane.getChildren().add(distributionComboBox);
+        }
         FXUtils.createHMCButton(pane, m_beastObject, m_input);
-        pane.getChildren().add(super.createComboBox(m_beastObject, m_input));
     	pane.setPadding(new Insets(5));
         getChildren().add(pane);
  
@@ -276,6 +278,9 @@ public class IIDInputEditor extends ScalarDistributionInputEditor {
         	}
         }
         
+        if (comboBox.getItems().size() == 0) {
+        	return null;
+        }
         
         comboBox.setId(text+".distr");
         comboBox.setButtonCell(new ListCell<BeautiSubTemplate>() {

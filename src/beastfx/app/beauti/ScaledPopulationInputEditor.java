@@ -8,8 +8,8 @@ import beastfx.app.inputeditor.InputEditor;
 import beastfx.app.util.FXUtils;
 import beast.base.core.BEASTInterface;
 import beast.base.core.Input;
-import beast.base.evolution.tree.coalescent.CompoundPopulationFunction;
-import beast.base.evolution.tree.coalescent.ScaledPopulationFunction;
+import beast.base.spec.evolution.tree.coalescent.CompoundPopulationFunction;
+import beast.base.spec.evolution.tree.coalescent.ScaledPopulationFunction;
 
 public class ScaledPopulationInputEditor extends InputEditor.Base {
 

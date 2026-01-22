@@ -28,12 +28,9 @@
             beast.base.spec.evolution.sitemodel.SiteModel.substModel,
             beast.base.spec.evolution.tree.coalescent.ExponentialGrowth,
             beast.base.spec.evolution.tree.coalescent.ConstantPopulation,
-            beast.base.evolution.tree.coalescent.Coalescent.populationModel,
-            beast.base.spec.evolution.tree.coalescent.BayesianSkyline.popSizes,
-            beast.base.spec.evolution.tree.coalescent.BayesianSkyline.groupSizes,
-            beast.base.spec.evolution.tree.coalescent.ScaledPopulationFunction.factor,
-            beast.base.spec.evolution.tree.coalescent.ScaledPopulationFunction.population,
-            beast.base.inference.State.stateNode'
+            beast.base.inference.State.stateNode,
+            beast.base.spec.inference.distribution.IID.distr
+            '
         collapsedPlugins ='beast.base.inference.MCMC.logger'
         suppressPlugins = 'beast.base.inference.MCMC.operator,
     		beast.base.inference.MCMC.operatorschedule,
@@ -113,7 +110,13 @@
             beast.base.inference.parameter.RealParameter.keys,
             beast.base.inference.parameter.BooleanParameter.keys,
             beast.base.inference.parameter.IntegerParameter.keys,
-            beast.base.inference.parameter.CompoundRealParameter.keys
+            beast.base.inference.parameter.CompoundRealParameter.keys,
+            beast.base.spec.inference.parameter.RealScalarParam.domain,
+            beast.base.spec.inference.parameter.IntScalarParam.domain,
+            beast.base.spec.inference.parameter.RealVectorParam.domain,
+            beast.base.spec.inference.parameter.IntVectorParam.domain,
+            beast.base.spec.inference.distribution.IID.param,
+            beast.base.spec.inference.distribution.MarkovChainDistribution.param
             '
         hmc='BirthDeath/index/,
 RandomTree/rootHeight/,

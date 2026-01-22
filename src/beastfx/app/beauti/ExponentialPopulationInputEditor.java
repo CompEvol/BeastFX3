@@ -8,7 +8,7 @@ import beastfx.app.inputeditor.InputEditor;
 import beastfx.app.util.FXUtils;
 import beast.base.core.BEASTInterface;
 import beast.base.core.Input;
-import beast.base.evolution.tree.coalescent.ExponentialGrowth;
+import beast.base.spec.evolution.tree.coalescent.ExponentialGrowth;
 
 public class ExponentialPopulationInputEditor extends InputEditor.Base {
 
