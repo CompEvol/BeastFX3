@@ -7,7 +7,7 @@
     <mergewith point='substModelTemplates'>
     
         <!-- gamma site model -->
-        <subtemplate id='pt Gamma Site Model' class='beast.base.spec.evolution.sitemodel.SiteModel' mainid='SiteModel.s:$(n)'
+        <subtemplate id='Gamma Site Model' class='beast.base.spec.evolution.sitemodel.SiteModel' mainid='SiteModel.s:$(n)'
             hmc='SiteModel/proportionInvariant/,
 SiteModel/mutationRate/,
 SiteModel/gammaCategoryCount/,
