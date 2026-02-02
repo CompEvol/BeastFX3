@@ -26,12 +26,13 @@
 	<property name="main_class_BEASTFX" value="beastfx.app.beastfx.Beast" />
 	<property name="report" value="${buildFX}/junitreport"/>
 
-    <property name="openjreMac" value="../../Downloads/zulu21.44.17-ca-fx-jdk21.0.8-macosx_aarch64"/>
-    <property name="openjreWin" value="../../Downloads/zulu21.44.17-ca-fx-jre21.44.17-win_x64/"/>
+    <property name="openjreMac" value="../../Downloads/zulu25.30.17-ca-fx-jdk25.0.1-macosx_aarch64"/>
+    <property name="openjreWin" value="../../Downloads/zulu25.32.21-ca-fx-jre25.0.2-win_x64/"/>
 <!--
     <property name="openjreLnx" value="../../Downloads/bellsoft-jre-17.0.4.1-full/"/>
+    <property name="openjreLnx" value="../../Downloads/zulu25.32.21-ca-fx-jre25.0.2-linux_aarch64/"/>
 -->
-    <property name="openjreLnx" value="../../Downloads/zulu21.44.17-ca-fx-jre21.44.17-linux_x64/"/>
+    <property name="openjreLnx" value="../../Downloads/zulu25.32.21-ca-fx-jre25.0.2-linux_x64/"/>
 
 	<path id="classpath">
 		<fileset dir="${libFX}" includes="jam.jar"/>
@@ -42,7 +43,7 @@
 		<fileset dir="${beast3path}/lib" includes="fest.jar"/>
 		<fileset dir="${beast3path}/lib" includes="colt.jar"/>
         <fileset dir="${beast3path}/lib" includes="antlr-runtime-4.13.2.jar"/>
-		<fileset dir="${beast3path}/lib" includes="commons-math3-3.6.1.jar"/>
+		<fileset dir="${beast3path}/lib" includes="commons.jar"/>
 
         <fileset dir="${beast3path}/lib/junit" includes="junit-platform-console-standalone-1.8.2.jar"/>
         <fileset dir="${libFX}" includes="assertj-core-3.20.2.jar"/>
@@ -440,44 +441,44 @@
 	<input message="Keystore password : " addproperty="storepass"></input>
 	<jsign file="${Windows_package_dir}/${BEAUti_name}.exe"
         	name="BEAUti"
-	        url="http://beast3.org"
+	        url="http://beast2.org"
 	        keystore="keystore.pfx"
-	        alias="http://beast3.org"
+	        alias="http://beast2.org"
 	        storepass="${storepass}"
 	        tsaurl="http://timestamp.comodoca.com/authenticode"/>
 	<jsign file="${Windows_package_dir}/${BEAST_name}.exe"
         	name="BEAST"
-	        url="http://beast3.org"
+	        url="http://beast2.org"
 	        keystore="keystore.pfx"
-	        alias="http://beast3.org"
+	        alias="http://beast2.org"
 	        storepass="${storepass}"
 	        tsaurl="http://timestamp.comodoca.com/authenticode"/>
 	<jsign file="${Windows_package_dir}/${LogCombiner_name}.exe"
         	name="LogCombiner"
-	        url="http://beast3.org"
+	        url="http://beast2.org"
 	        keystore="keystore.pfx"
-	        alias="http://beast3.org"
+	        alias="http://beast2.org"
 	        storepass="${storepass}"
 	        tsaurl="http://timestamp.comodoca.com/authenticode"/>
 	<jsign file="${Windows_package_dir}/TreeAnnotator.exe"
         	name="TreeAnnotator"
-	        url="http://beast3.org"
+	        url="http://beast2.org"
 	        keystore="keystore.pfx"
-	        alias="http://beast3.org"
+	        alias="http://beast2.org"
 	        storepass="${storepass}"
 	        tsaurl="http://timestamp.comodoca.com/authenticode"/>
 	<jsign file="${Windows_package_dir}/DensiTree.exe"
         	name="DensiTree"
-	        url="http://beast3.org"
+	        url="http://beast2.org"
 	        keystore="keystore.pfx"
-	        alias="http://beast3.org"
+	        alias="http://beast2.org"
 	        storepass="${storepass}"
 	        tsaurl="http://timestamp.comodoca.com/authenticode"/>
 	<jsign file="${Windows_package_dir}/AppLauncher.exe"
         	name="AppLauncher"
-	        url="http://beast3.org"
+	        url="http://beast2.org"
 	        keystore="keystore.pfx"
-	        alias="http://beast3.org"
+	        alias="http://beast2.org"
 	        storepass="${storepass}"
 	        tsaurl="http://timestamp.comodoca.com/authenticode"/>
 
