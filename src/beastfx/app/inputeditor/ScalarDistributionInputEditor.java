@@ -1,37 +1,17 @@
 package beastfx.app.inputeditor;
 
 
-
-
-
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.math.MathException;
-
 import beast.base.core.BEASTInterface;
 import beast.base.core.Input;
 import beast.base.core.Log;
 import beast.base.inference.Distribution;
 import beast.base.parser.PartitionContext;
 import beast.base.spec.Bounded;
-import beast.base.spec.domain.Int;
-import beast.base.spec.domain.NonNegativeInt;
-import beast.base.spec.domain.NonNegativeReal;
-import beast.base.spec.domain.PositiveInt;
-import beast.base.spec.domain.PositiveReal;
-import beast.base.spec.domain.Real;
+import beast.base.spec.domain.*;
 import beast.base.spec.evolution.tree.MRCAPrior;
 import beast.base.spec.inference.distribution.IID;
-//import beast.base.spec.inference.distribution.OffsetRealDistribution;
 import beast.base.spec.inference.distribution.ScalarDistribution;
 import beast.base.spec.inference.distribution.TensorDistribution;
-//import beast.base.spec.inference.distribution.TruncatedIntDistribution;
 import beast.base.spec.inference.distribution.TruncatedReal;
 import beast.base.spec.inference.parameter.BoolScalarParam;
 import beast.base.spec.inference.parameter.IntScalarParam;
@@ -44,24 +24,21 @@ import beastfx.app.util.FXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.chart.XYChart.Data;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.Tooltip;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.chart.XYChart.Data;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import org.apache.commons.math.MathException;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implements HasExpandBox {
 
@@ -439,15 +416,20 @@ public class ScalarDistributionInputEditor extends BEASTObjectInputEditor implem
             } catch (Throwable e) {
             	// use default
             }
-            double lowerParam = param == null ? 0 :
-            	param.getLower() instanceof Integer ? (int) param.getLower() : (double) param.getLower(); 
+//            double lowerParam = param == null ? 0 :
+//            	param.getLower() instanceof Integer ? (int) param.getLower() : (double) param.getLower();
+            double lowerParam = (param != null && param.getLower() instanceof Number lower)
+                    ? lower.doubleValue() : 0.0;
             if (param != null && minValue < lowerParam) {
             	minValue = minValue + 0.99999 * (lowerParam - minValue);
             }
-            double upperParam = param == null ? 0 :
-            	param.getUpper() instanceof Integer ? (int) param.getUpper() : (double) param.getUpper(); 
+//            double upperParam = param == null ? 0 :
+//            	param.getUpper() instanceof Integer ? (int) param.getUpper() : (double) param.getUpper();
+            double upperParam = (param != null && param.getUpper() instanceof Number upper)
+                    ? upper.doubleValue() : 0.0;
             if (param != null && maxValue > upperParam) {
-            	maxValue = (double) param.getUpper() + 0.001 * (maxValue - upperParam);
+//            	maxValue = (double) param.getUpper() + 0.001 * (maxValue - upperParam);
+                maxValue = upperParam + 0.001 * (maxValue - upperParam);
             }
             double xRange = maxValue - minValue;
             // adjust yMax so that the ticks come out right
